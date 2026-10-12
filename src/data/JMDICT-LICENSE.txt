@@ -1,0 +1,25 @@
+The Japanese vocabulary bundled in src/data/jlpt-words.js is a derived
+work built for this app.
+
+It uses:
+
+- JMdict, by the Electronic Dictionary Research and Development Group.
+  https://www.edrdg.org/jmdict/j_jmdict.html
+  Licensed under CC BY-SA 4.0.
+- OpenJLPT N5–N1 vocabulary lists, which compile Jonathan Waller's JLPT
+  lists with JMdict readings and parts of speech.
+  https://github.com/evanclan/OpenJLPT
+  Licensed under CC BY-SA 4.0.
+- Short Chinese glosses aligned to those English senses, with help from
+  ECDICT (MIT) by skywind3000 / Linwei.
+
+Example sentences and collocations in the word cards are original
+learner lines written for this app.
+
+The vocabulary data in src/data/jlpt-words.js is released under
+CC BY-SA 4.0.
+https://creativecommons.org/licenses/by-sa/4.0/
+
+JLPT levels are community lists. The Japan Foundation does not publish
+an official N5–N1 word list. After the N5–N1 entries, high-frequency
+JMdict headwords fill the list out to about twelve thousand.
