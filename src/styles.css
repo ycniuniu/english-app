@@ -821,18 +821,6 @@ main {
   animation: rise-in 0.32s ease;
 }
 
-.fact-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  margin-bottom: 6px;
-}
-
-.fact-head .fact-label {
-  margin: 0;
-}
-
 .ja .word-en,
 .ja .word-ph,
 .ja .form-word,
@@ -843,11 +831,6 @@ main {
 .ja .spell,
 .ja .typed {
   font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Yu Gothic UI", "Noto Sans JP", "PingFang SC", var(--sans);
-}
-
-.ja .sense-zh {
-  flex: 1;
-  min-width: 0;
 }
 
 .lemma,

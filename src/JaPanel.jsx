@@ -53,17 +53,7 @@ function JaFacts({ item, reveal, rate }) {
     <div className="word-facts">
       {labels.length ? (
         <div className="fact-block">
-          <div className="fact-head">
-            <p className="fact-label">词性</p>
-            <SpeakButton
-              text={labels.join('、')}
-              id={`${speakId}-pos`}
-              rate={rate}
-              label="朗读词性"
-              compact
-              lang="zh-CN"
-            />
-          </div>
+          <p className="fact-label">词性</p>
           <p className="pos-row">
             {labels.map((label) => (
               <span key={label} className="sense-pos">
@@ -86,27 +76,11 @@ function JaFacts({ item, reveal, rate }) {
                   <span className="form-word" lang="ja">
                     {form.word}
                   </span>
-                  <SpeakButton
-                    text={form.reading || form.word}
-                    id={`${speakId}-form-${form.key}`}
-                    rate={rate}
-                    label={`朗读${form.name}`}
-                    compact
-                    lang="ja-JP"
-                  />
                 </li>
               ))
             ) : (
               <li>
                 <span className="form-label">无词形变化（{posName}）</span>
-                <SpeakButton
-                  text={entry.reading || entry.word}
-                  id={`${speakId}-form-none`}
-                  rate={rate}
-                  label="朗读读音"
-                  compact
-                  lang="ja-JP"
-                />
               </li>
             )}
           </ul>
@@ -119,14 +93,6 @@ function JaFacts({ item, reveal, rate }) {
             <p className="sense-head">
               <span className="sense-pos">{sense.pos}</span>
               <span className="sense-zh">{sense.zh}</span>
-              <SpeakButton
-                text={sense.zh}
-                id={`${speakId}-zh-${senseIndex}`}
-                rate={rate}
-                label="朗读这条释义"
-                compact
-                lang="zh-CN"
-              />
             </p>
             {reveal
               ? (sense.examples || []).map(([ja, zh], index) => (
