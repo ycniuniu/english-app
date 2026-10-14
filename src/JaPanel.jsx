@@ -3,6 +3,7 @@ import { answersMatchJa } from './ja-answer.js'
 import { cardItem, JA_STORAGE_KEY, loadJaProgress, trackIds } from './ja-progress.js'
 import { SpeakButton } from './SpeakButton.jsx'
 import { stopSpeech } from './speech.js'
+import { DictField, hasText, listOrEmpty } from './word-detail.jsx'
 import { readJson, writeJson } from './storage.js'
 import {
   NEW_BATCH,
@@ -21,13 +22,6 @@ const TRACKS = [
   { id: 'verb', label: '动词变形' },
 ]
 
-function formPos(entry) {
-  const labels = entry.pos || []
-  if (labels.includes('动词')) return '动词'
-  if (labels.includes('形容词')) return '形容词'
-  return labels[0] || '词'
-}
-
 function JaLine({ text, zh, id, rate, label }) {
   return (
     <div className="spoken-line">
@@ -42,120 +36,127 @@ function JaLine({ text, zh, id, rate, label }) {
   )
 }
 
-function JaFacts({ item, reveal, rate }) {
-  const entry = item.entry
-  const labels = entry.pos || []
-  const speakId = `ja-${item.key}`
-  const forms = item.kind === 'conj' ? (item.form ? [item.form] : []) : entry.forms || []
-  const posName = formPos(entry)
-
+function JaSenseHints({ entry }) {
+  if (!entry?.senses?.length) return null
   return (
     <div className="word-facts">
-      {labels.length ? (
-        <div className="fact-block">
-          <div className="fact-head">
-            <p className="fact-label">词性</p>
-            <SpeakButton
-              text={labels.join('、')}
-              id={`${speakId}-pos`}
-              rate={rate}
-              label="朗读词性"
-              compact
-              lang="zh-CN"
-            />
-          </div>
-          <p className="pos-row">
-            {labels.map((label) => (
-              <span key={label} className="sense-pos">
-                {label}
-              </span>
-            ))}
-          </p>
-        </div>
-      ) : null}
-      {reveal ? (
-        <div className="fact-block">
-          <p className="fact-label">词形</p>
-          <ul className="form-list">
-            {forms.length ? (
-              forms.map((form) => (
-                <li key={form.key}>
-                  <span className="form-label">
-                    {form.name}（{posName}）
-                  </span>
-                  <span className="form-word" lang="ja">
-                    {form.word}
-                  </span>
-                  <SpeakButton
-                    text={form.reading || form.word}
-                    id={`${speakId}-form-${form.key}`}
-                    rate={rate}
-                    label={`朗读${form.name}`}
-                    compact
-                    lang="ja-JP"
-                  />
-                </li>
-              ))
-            ) : (
-              <li>
-                <span className="form-label">无词形变化（{posName}）</span>
-                <SpeakButton
-                  text={entry.reading || entry.word}
-                  id={`${speakId}-form-none`}
-                  rate={rate}
-                  label="朗读读音"
-                  compact
-                  lang="ja-JP"
-                />
-              </li>
-            )}
-          </ul>
-        </div>
-      ) : null}
-      <div className="fact-block">
-        <p className="fact-label">{reveal ? '释义' : '同一个词的几条中文'}</p>
-        {(entry.senses || []).map((sense, senseIndex) => (
+      <DictField label="同一个词的几条中文">
+        {entry.senses.map((sense, senseIndex) => (
           <div key={`${sense.pos}-${sense.zh}-${senseIndex}`} className="sense">
             <p className="sense-head">
               <span className="sense-pos">{sense.pos}</span>
               <span className="sense-zh">{sense.zh}</span>
-              <SpeakButton
-                text={sense.zh}
-                id={`${speakId}-zh-${senseIndex}`}
-                rate={rate}
-                label="朗读这条释义"
-                compact
-                lang="zh-CN"
-              />
             </p>
-            {reveal
-              ? (sense.examples || []).map(([ja, zh], index) => (
-                  <div key={`${index}-${ja}`} className="example">
-                    <JaLine
-                      text={ja}
-                      zh={zh}
-                      id={`${speakId}-ex-${senseIndex}-${index}`}
-                      rate={rate}
-                      label="朗读这个例句"
-                    />
-                  </div>
-                ))
-              : null}
           </div>
         ))}
-      </div>
-      {reveal ? (
-        <div className="fact-block">
-          <p className="fact-label">搭配</p>
-          <ul className="phrases">
-            {(entry.phrases || []).map(([ja, zh], index) => (
-              <li key={`${index}-${ja}`}>
-                <JaLine text={ja} zh={zh} id={`${speakId}-ph-${index}`} rate={rate} label="朗读这个搭配" />
-              </li>
-            ))}
-          </ul>
+      </DictField>
+    </div>
+  )
+}
+
+function JaDetail({ item, rate }) {
+  const entry = item.entry
+  const speakId = `ja-${item.key}`
+  const surface = item.kind === 'conj' ? item.form.word : entry.word
+  const reading = item.kind === 'conj' ? item.form.reading : entry.reading
+  const spoken = reading || surface
+  const showPhonetic = hasText(reading) && reading !== surface
+  const phonetic = showPhonetic ? reading : ''
+  const labels = entry.pos || []
+  const senses = listOrEmpty(entry.senses)
+  const examples = listOrEmpty(
+    (entry.senses || []).flatMap((sense, senseIndex) =>
+      (sense.examples || []).map(([ja, zh], index) => ({ ja, zh, senseIndex, index })),
+    ),
+  )
+  const phrases = listOrEmpty(entry.phrases)
+  const synonyms = listOrEmpty(entry.synonyms)
+  const antonyms = listOrEmpty(entry.antonyms)
+  const roots = hasText(entry.roots) ? String(entry.roots).trim() : null
+  const derivatives = listOrEmpty(entry.derivatives)
+  const frequency = hasText(entry.frequency) ? String(entry.frequency).trim() : null
+
+  return (
+    <div className="word-facts">
+      <DictField label="单词">
+        <div className="word-en-row">
+          <p className="word-en" lang="ja">
+            {surface}
+          </p>
+          <SpeakButton text={spoken} id={`${speakId}-head`} rate={rate} label="朗读这个词" lang="ja-JP" />
         </div>
-      ) : null}
+        {item.kind === 'kana' && entry.syllables?.length ? (
+          <p className="syllables" lang="ja">
+            音节 {entry.syllables.join('・')}
+          </p>
+        ) : null}
+        {item.kind === 'conj' ? (
+          <p className="lemma" lang="ja">
+            词典形 {entry.word}
+            {entry.reading && entry.reading !== entry.word ? `　${entry.reading}` : ''}
+          </p>
+        ) : null}
+      </DictField>
+      <DictField label="音标" empty={!showPhonetic}>
+        <p className="word-ph" lang="ja">
+          {phonetic}
+        </p>
+      </DictField>
+      <DictField label="词性" empty={!labels.length}>
+        <p className="pos-row">
+          {labels.map((label) => (
+            <span key={label} className="sense-pos">
+              {label}
+            </span>
+          ))}
+        </p>
+      </DictField>
+      <DictField label="中文释义" empty={!senses}>
+        {senses?.map((sense, senseIndex) => (
+          <div key={`${sense.pos}-${sense.zh}-${senseIndex}`} className="sense">
+            <p className="sense-head">
+              <span className="sense-zh">{sense.zh}</span>
+            </p>
+          </div>
+        ))}
+      </DictField>
+      <DictField label="例句" empty={!examples}>
+        {examples?.map(({ ja, zh, senseIndex, index }) => (
+          <div key={`${senseIndex}-${index}-${ja}`} className="example">
+            <JaLine
+              text={ja}
+              zh={zh}
+              id={`${speakId}-ex-${senseIndex}-${index}`}
+              rate={rate}
+              label="朗读这个例句"
+            />
+          </div>
+        ))}
+      </DictField>
+      <DictField label="搭配" empty={!phrases}>
+        <ul className="phrases">
+          {phrases?.map(([ja, zh], index) => (
+            <li key={`${index}-${ja}`}>
+              <JaLine text={ja} zh={zh} id={`${speakId}-ph-${index}`} rate={rate} label="朗读这个搭配" />
+            </li>
+          ))}
+        </ul>
+      </DictField>
+      <DictField label="同义词" empty={!synonyms}>
+        <p className="fact-text">{synonyms?.join('、')}</p>
+      </DictField>
+      <DictField label="反义词" empty={!antonyms}>
+        <p className="fact-text">{antonyms?.join('、')}</p>
+      </DictField>
+      <DictField label="词根词缀" empty={!roots}>
+        <p className="fact-text">{roots}</p>
+      </DictField>
+      <DictField label="派生词" empty={!derivatives}>
+        <p className="fact-text">{derivatives?.join('、')}</p>
+      </DictField>
+      <DictField label="词频" empty={!frequency}>
+        <p className="fact-text">{frequency}</p>
+      </DictField>
     </div>
   )
 }
@@ -207,39 +208,6 @@ function homeCopy(stats, missRound, track) {
     heading: '从最常用的词开始',
     lead: '新词先看日语和中文。合上以后，只留中文，把日语写出来。汉字或假名都可以。写对了，下次隔得更久；写错了，今天还会再遇到。',
   }
-}
-
-function Headword({ item, rate }) {
-  const entry = item.entry
-  const surface = item.kind === 'conj' ? item.form.word : entry.word
-  const reading = item.kind === 'conj' ? item.form.reading : entry.reading
-  const spoken = reading || surface
-  return (
-    <>
-      <div className="word-en-row">
-        <p className="word-en" lang="ja">
-          {surface}
-        </p>
-        <SpeakButton text={spoken} id={`ja-${item.key}-head`} rate={rate} label="朗读这个词" lang="ja-JP" />
-      </div>
-      {reading && reading !== surface ? (
-        <p className="word-ph" lang="ja">
-          {reading}
-        </p>
-      ) : null}
-      {item.kind === 'kana' && entry.syllables?.length ? (
-        <p className="syllables" lang="ja">
-          音节 {entry.syllables.join('・')}
-        </p>
-      ) : null}
-      {item.kind === 'conj' ? (
-        <p className="lemma" lang="ja">
-          词典形 {entry.word}
-          {entry.reading && entry.reading !== entry.word ? `　${entry.reading}` : ''}
-        </p>
-      ) : null}
-    </>
-  )
 }
 
 export function JaPanel({ rate }) {
@@ -459,7 +427,6 @@ export function JaPanel({ rate }) {
       </>
     )
   } else if (phase === 'result' && result) {
-    const gloss = current.entry.senses?.[0]?.zh || ''
     body = (
       <>
         <div className="words-body">
@@ -469,9 +436,7 @@ export function JaPanel({ rate }) {
           </p>
           <div className={result.correct ? 'result-card ok' : 'result-card bad'}>
             <p className="result-flag">{result.correct ? '记住了' : '先记下这个写法'}</p>
-            <Headword item={current} rate={rate} />
-            <p className="word-zh">{gloss}</p>
-            <JaFacts item={current} reveal rate={rate} />
+            <JaDetail item={current} rate={rate} />
             {!result.correct && typed.trim() ? <p className="typed">你写的是 {typed.trim()}</p> : null}
             <p className="due-note">{duePhrase(result.card, today)}</p>
           </div>
@@ -497,9 +462,7 @@ export function JaPanel({ rate }) {
           </p>
           {preview ? (
             <>
-              <Headword item={current} rate={rate} />
-              <p className="word-zh">{gloss}</p>
-              <JaFacts item={current} reveal rate={rate} />
+              <JaDetail item={current} rate={rate} />
               <p className="spell-hint">
                 {current.kind === 'conj' ? '先看词典形和这个变形，再合上默写。' : '先读一遍，记住写法，再合上默写。'}
               </p>
@@ -516,7 +479,7 @@ export function JaPanel({ rate }) {
                     : ''}
                 </p>
               ) : null}
-              <JaFacts item={current} reveal={false} rate={rate} />
+              <JaSenseHints entry={current.entry} />
             </>
           )}
           <input

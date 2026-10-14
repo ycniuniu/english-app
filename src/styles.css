@@ -519,6 +519,19 @@ main {
   letter-spacing: 0.14em;
 }
 
+.fact-none,
+.fact-text {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 15px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.fact-block .word-en-row {
+  margin-top: 0;
+}
+
 .pos-row {
   display: flex;
   flex-wrap: wrap;

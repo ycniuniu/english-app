@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { SpeakButton } from './SpeakButton.jsx'
 import { speakText, stopSpeech, useSpeech } from './speech.js'
-import { broadPos, describeForms, speakableParts, wordPosLabels } from './word-facts.js'
+import { broadPos, speakableParts, wordPosLabels } from './word-facts.js'
+import { DictField, hasText, listOrEmpty } from './word-detail.jsx'
 import { readJson, writeJson } from './storage.js'
 import {
   NEW_BATCH,
@@ -59,85 +60,113 @@ function SpokenLine({ text, zh, id, rate, label, englishClass }) {
   )
 }
 
-function WordFacts({ detail, reveal, rate, speakId, headword }) {
-  if (!detail) return null
-  const forms = describeForms(detail.forms, detail.senses, headword)
-  const labels = wordPosLabels(detail.senses)
+function SenseHints({ detail }) {
+  if (!detail?.senses?.length) return null
   return (
     <div className="word-facts">
-      {labels.length ? (
-        <div className="fact-block">
-          <p className="fact-label">词性</p>
-          <p className="pos-row">
-            {labels.map((label) => (
-              <span key={label} className="sense-pos">
-                {label}
-              </span>
-            ))}
-          </p>
-        </div>
-      ) : null}
-      {reveal && forms.length ? (
-        <div className="fact-block">
-          <p className="fact-label">词形</p>
-          <ul className="form-list">
-            {forms.map((item, index) => (
-              <li key={`${index}-${item.label}-${item.word}`}>
-                <span className="form-label">{item.label}</span>
-                {item.word ? (
-                  <span className="form-word" lang="en">
-                    {item.word}
-                  </span>
-                ) : null}
-              </li>
-            ))}
-          </ul>
-        </div>
-      ) : null}
-      <div className="fact-block">
-        <p className="fact-label">{reveal ? '释义' : '同一个词的几条中文'}</p>
-        {detail.senses.map((sense, senseIndex) => (
+      <DictField label="同一个词的几条中文">
+        {detail.senses.map((sense) => (
           <div key={`${sense.pos}-${sense.zh}`} className="sense">
             <p className="sense-head">
               <span className="sense-pos">{broadPos(sense.pos)}</span>
               <span className="sense-zh">{sense.zh}</span>
             </p>
-            {reveal
-              ? sense.examples.map(([en, zh], index) => (
-                  <div key={`${index}-${en}`} className="example">
-                    <SpokenLine
-                      text={en}
-                      zh={zh}
-                      id={`${speakId}-ex-${senseIndex}-${index}`}
-                      rate={rate}
-                      label="朗读这个例句"
-                      englishClass="example-en"
-                    />
-                  </div>
-                ))
-              : null}
           </div>
         ))}
-      </div>
-      {reveal ? (
-        <div className="fact-block">
-          <p className="fact-label">搭配</p>
-          <ul className="phrases">
-            {detail.phrases.map(([en, zh], index) => (
-              <li key={`${index}-${en}`}>
-                <SpokenLine
-                  text={en}
-                  zh={zh}
-                  id={`${speakId}-ph-${index}`}
-                  rate={rate}
-                  label="朗读这个搭配"
-                  englishClass="phrase-en"
-                />
-              </li>
-            ))}
-          </ul>
+      </DictField>
+    </div>
+  )
+}
+
+function WordDetail({ detail, rate, speakId, headword, phonetic }) {
+  const labels = wordPosLabels(detail?.senses)
+  const senses = listOrEmpty(detail?.senses)
+  const examples = listOrEmpty(
+    (detail?.senses || []).flatMap((sense, senseIndex) =>
+      (sense.examples || []).map(([en, zh], index) => ({ en, zh, senseIndex, index })),
+    ),
+  )
+  const phrases = listOrEmpty(detail?.phrases)
+  const synonyms = listOrEmpty(detail?.synonyms)
+  const antonyms = listOrEmpty(detail?.antonyms)
+  const roots = hasText(detail?.roots) ? String(detail.roots).trim() : null
+  const derivatives = listOrEmpty(detail?.derivatives)
+  const frequency = hasText(detail?.frequency) ? String(detail.frequency).trim() : null
+
+  return (
+    <div className="word-facts">
+      <DictField label="单词">
+        <div className="word-en-row">
+          <p className="word-en">{headword}</p>
+          <SpeakButton text={headword} id={speakId} rate={rate} label="朗读这个单词" />
         </div>
-      ) : null}
+      </DictField>
+      <DictField label="音标" empty={!hasText(phonetic)}>
+        <p className="word-ph">{phonetic}</p>
+      </DictField>
+      <DictField label="词性" empty={!labels.length}>
+        <p className="pos-row">
+          {labels.map((label) => (
+            <span key={label} className="sense-pos">
+              {label}
+            </span>
+          ))}
+        </p>
+      </DictField>
+      <DictField label="中文释义" empty={!senses}>
+        {senses?.map((sense) => (
+          <div key={`${sense.pos}-${sense.zh}`} className="sense">
+            <p className="sense-head">
+              <span className="sense-zh">{sense.zh}</span>
+            </p>
+          </div>
+        ))}
+      </DictField>
+      <DictField label="例句" empty={!examples}>
+        {examples?.map(({ en, zh, senseIndex, index }) => (
+          <div key={`${senseIndex}-${index}-${en}`} className="example">
+            <SpokenLine
+              text={en}
+              zh={zh}
+              id={`${speakId}-ex-${senseIndex}-${index}`}
+              rate={rate}
+              label="朗读这个例句"
+              englishClass="example-en"
+            />
+          </div>
+        ))}
+      </DictField>
+      <DictField label="搭配" empty={!phrases}>
+        <ul className="phrases">
+          {phrases?.map(([en, zh], index) => (
+            <li key={`${index}-${en}`}>
+              <SpokenLine
+                text={en}
+                zh={zh}
+                id={`${speakId}-ph-${index}`}
+                rate={rate}
+                label="朗读这个搭配"
+                englishClass="phrase-en"
+              />
+            </li>
+          ))}
+        </ul>
+      </DictField>
+      <DictField label="同义词" empty={!synonyms}>
+        <p className="fact-text">{synonyms?.join('、')}</p>
+      </DictField>
+      <DictField label="反义词" empty={!antonyms}>
+        <p className="fact-text">{antonyms?.join('、')}</p>
+      </DictField>
+      <DictField label="词根词缀" empty={!roots}>
+        <p className="fact-text">{roots}</p>
+      </DictField>
+      <DictField label="派生词" empty={!derivatives}>
+        <p className="fact-text">{derivatives?.join('、')}</p>
+      </DictField>
+      <DictField label="词频" empty={!frequency}>
+        <p className="fact-text">{frequency}</p>
+      </DictField>
     </div>
   )
 }
@@ -377,13 +406,13 @@ export function WordsPanel({ rate }) {
           </p>
           <div className={result.correct ? 'result-card ok' : 'result-card bad'}>
             <p className="result-flag">{result.correct ? '记住了' : '先记下这个拼法'}</p>
-            <div className="word-en-row">
-              <p className="word-en">{current.word}</p>
-              <SpeakButton text={current.word} id={`word-${current.id}`} rate={rate} label="朗读这个单词" />
-            </div>
-            {current.phonetic ? <p className="word-ph">{current.phonetic}</p> : null}
-            <p className="word-zh">{current.zh}</p>
-            <WordFacts detail={current.detail} reveal rate={rate} speakId={`card-${current.id}`} headword={current.word} />
+            <WordDetail
+              detail={current.detail}
+              rate={rate}
+              speakId={`card-${current.id}`}
+              headword={current.word}
+              phonetic={current.phonetic}
+            />
             {!result.correct && typed.trim() ? <p className="typed">你写的是 {typed.trim()}</p> : null}
             <p className="due-note">{duePhrase(result.card, today)}</p>
           </div>
@@ -405,20 +434,20 @@ export function WordsPanel({ rate }) {
           </p>
           {preview ? (
             <>
-              <div className="word-en-row">
-                <p className="word-en">{current.word}</p>
-                <SpeakButton text={current.word} id={`word-${current.id}`} rate={rate} label="朗读这个单词" />
-              </div>
-              {current.phonetic ? <p className="word-ph">{current.phonetic}</p> : null}
-              <p className="word-zh">{current.zh}</p>
-              <WordFacts detail={current.detail} reveal rate={rate} speakId={`card-${current.id}`} headword={current.word} />
+              <WordDetail
+                detail={current.detail}
+                rate={rate}
+                speakId={`card-${current.id}`}
+                headword={current.word}
+                phonetic={current.phonetic}
+              />
               <p className="spell-hint">先读一遍，记住拼法，再合上默写。</p>
             </>
           ) : (
             <>
               <p className="prompt-label">看中文，写出英文</p>
               <p className="word-zh">{current.zh}</p>
-              <WordFacts detail={current.detail} reveal={false} rate={rate} speakId={`card-${current.id}`} headword={current.word} />
+              <SenseHints detail={current.detail} />
             </>
           )}
           <input
