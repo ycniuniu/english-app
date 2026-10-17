@@ -1,6 +1,37 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { describeForms, speakableParts, wordPosLabels } from '../src/word-facts.js'
+import { describeForms, glossPosVaries, recallGlosses, speakableParts, wordPosLabels } from '../src/word-facts.js'
+
+test('recall glosses keep sense order and surface a head gloss that is not already listed', () => {
+  assert.deepEqual(
+    recallGlosses(
+      [
+        { pos: '名词', zh: '国家' },
+        { pos: '名词', zh: '乡村' },
+      ],
+      '国家',
+    ).map((item) => item.zh),
+    ['国家', '乡村'],
+  )
+  assert.equal(
+    glossPosVaries([
+      { pos: '名词', zh: '国家' },
+      { pos: '名词', zh: '乡村' },
+    ]),
+    false,
+  )
+  assert.equal(
+    glossPosVaries([
+      { pos: '及物动词', zh: '离开' },
+      { pos: '名词', zh: '休假' },
+    ]),
+    true,
+  )
+  assert.deepEqual(
+    recallGlosses([{ pos: '动词', zh: '来' }], '过来').map((item) => item.zh),
+    ['过来', '来'],
+  )
+})
 
 test('inflections are labeled with a Chinese part of speech', () => {
   assert.deepEqual(describeForms(['动词 make / made / made / making'], [{ pos: '及物动词' }]), [

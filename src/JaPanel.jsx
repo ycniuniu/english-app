@@ -14,6 +14,7 @@ import {
   summarizeIds,
   todayKey,
 } from './srs.js'
+import { glossPosVaries, recallGlosses } from './word-facts.js'
 
 const TRACKS = [
   { id: 'word', label: '词汇' },
@@ -42,15 +43,47 @@ function JaLine({ text, zh, id, rate, label }) {
   )
 }
 
+function JaSpellField({ inputRef, draft, setDraft, confirm, preview, label }) {
+  return (
+    <input
+      id="ja-spell"
+      ref={inputRef}
+      className={preview ? 'spell spell-off' : 'spell'}
+      lang="ja"
+      value={draft}
+      placeholder={preview ? '' : '在这里默写'}
+      autoCapitalize="none"
+      autoCorrect="off"
+      autoComplete="off"
+      spellCheck={false}
+      enterKeyHint="done"
+      aria-label={label}
+      aria-hidden={preview}
+      tabIndex={preview ? -1 : 0}
+      onChange={(event) => setDraft(event.target.value)}
+      onKeyDown={(event) => {
+        if (preview) return
+        if (event.nativeEvent.isComposing || event.keyCode === 229) return
+        if (event.key === 'Enter') {
+          event.preventDefault()
+          confirm()
+        }
+      }}
+    />
+  )
+}
+
 function JaFacts({ item, reveal, rate }) {
   const entry = item.entry
   const labels = entry.pos || []
   const speakId = `ja-${item.key}`
   const forms = item.kind === 'conj' ? (item.form ? [item.form] : []) : entry.forms || []
   const posName = formPos(entry)
+  const glosses = reveal ? entry.senses || [] : recallGlosses(entry.senses, entry.senses?.[0]?.zh)
+  const showSensePos = reveal || glossPosVaries(glosses)
 
   return (
-    <div className="word-facts">
+    <div className={reveal ? 'word-facts' : 'word-facts compact'}>
       {labels.length ? (
         <div className="fact-block">
           <div className="fact-head">
@@ -114,35 +147,37 @@ function JaFacts({ item, reveal, rate }) {
       ) : null}
       <div className="fact-block">
         <p className="fact-label">{reveal ? '释义' : '同一个词的几条中文'}</p>
-        {(entry.senses || []).map((sense, senseIndex) => (
-          <div key={`${sense.pos}-${sense.zh}-${senseIndex}`} className="sense">
-            <p className="sense-head">
-              <span className="sense-pos">{sense.pos}</span>
-              <span className="sense-zh">{sense.zh}</span>
-              <SpeakButton
-                text={sense.zh}
-                id={`${speakId}-zh-${senseIndex}`}
-                rate={rate}
-                label="朗读这条释义"
-                compact
-                lang="zh-CN"
-              />
-            </p>
-            {reveal
-              ? (sense.examples || []).map(([ja, zh], index) => (
-                  <div key={`${index}-${ja}`} className="example">
-                    <JaLine
-                      text={ja}
-                      zh={zh}
-                      id={`${speakId}-ex-${senseIndex}-${index}`}
-                      rate={rate}
-                      label="朗读这个例句"
-                    />
-                  </div>
-                ))
-              : null}
-          </div>
-        ))}
+        <div className={reveal ? 'sense-stack' : showSensePos ? 'sense-row' : 'sense-row plain'} role={reveal ? undefined : 'list'}>
+          {glosses.map((sense, senseIndex) => (
+            <div key={`${sense.pos}-${sense.zh}-${senseIndex}`} className="sense" role={reveal ? undefined : 'listitem'}>
+              <p className="sense-head">
+                {showSensePos ? <span className="sense-pos">{sense.pos}</span> : null}
+                <span className="sense-zh">{sense.zh}</span>
+                <SpeakButton
+                  text={sense.zh}
+                  id={`${speakId}-zh-${senseIndex}`}
+                  rate={rate}
+                  label="朗读这条释义"
+                  compact
+                  lang="zh-CN"
+                />
+              </p>
+              {reveal
+                ? (sense.examples || []).map(([ja, zh], index) => (
+                    <div key={`${index}-${ja}`} className="example">
+                      <JaLine
+                        text={ja}
+                        zh={zh}
+                        id={`${speakId}-ex-${senseIndex}-${index}`}
+                        rate={rate}
+                        label="朗读这个例句"
+                      />
+                    </div>
+                  ))
+                : null}
+            </div>
+          ))}
+        </div>
       </div>
       {reveal ? (
         <div className="fact-block">
@@ -284,7 +319,7 @@ export function JaPanel({ rate }) {
   }, [cards])
 
   useEffect(() => {
-    if (phase === 'recall') inputRef.current?.focus()
+    if (phase === 'recall') inputRef.current?.focus({ preventScroll: true })
   }, [phase, step])
 
   const words = pack?.words || null
@@ -327,7 +362,7 @@ export function JaPanel({ rate }) {
     setDraft('')
     phaseRef.current = 'recall'
     setPhase('recall')
-    inputRef.current?.focus()
+    inputRef.current?.focus({ preventScroll: true })
   }
 
   function grade(correct) {
@@ -483,11 +518,9 @@ export function JaPanel({ rate }) {
         </div>
       </>
     )
-  } else {
-    const preview = phase === 'preview'
+  } else if (phase === 'preview') {
     const gloss = current.entry.senses?.[0]?.zh || ''
-    const prompt =
-      current.kind === 'conj' ? `写出${current.form.name}` : '看中文，写出日语'
+    const spellLabel = current.kind === 'conj' ? `默写${current.form.name}` : '默写日语'
     body = (
       <>
         <div className="words-body">
@@ -495,82 +528,67 @@ export function JaPanel({ rate }) {
             {current.entry.level}
             {current.kind === 'conj' ? ` · ${current.form.name}` : ''} · 第 {step + 1} / {queue.length} 个
           </p>
-          {preview ? (
-            <>
-              <Headword item={current} rate={rate} />
-              <p className="word-zh">{gloss}</p>
-              <JaFacts item={current} reveal rate={rate} />
-              <p className="spell-hint">
-                {current.kind === 'conj' ? '先看词典形和这个变形，再合上默写。' : '先读一遍，记住写法，再合上默写。'}
-              </p>
-            </>
-          ) : (
-            <>
-              <p className="prompt-label">{prompt}</p>
-              <p className="word-zh">{gloss}</p>
-              {current.kind === 'conj' ? (
-                <p className="lemma" lang="ja">
-                  词典形 {current.entry.word}
-                  {current.entry.reading && current.entry.reading !== current.entry.word
-                    ? `　${current.entry.reading}`
-                    : ''}
-                </p>
-              ) : null}
-              <JaFacts item={current} reveal={false} rate={rate} />
-            </>
-          )}
-          <input
-            id="ja-spell"
-            ref={inputRef}
-            className={preview ? 'spell spell-off' : 'spell'}
-            lang="ja"
-            value={draft}
-            placeholder={preview ? '' : '在这里默写'}
-            autoCapitalize="none"
-            autoCorrect="off"
-            autoComplete="off"
-            spellCheck={false}
-            enterKeyHint="done"
-            aria-label={current.kind === 'conj' ? `默写${current.form.name}` : '默写日语'}
-            aria-hidden={preview}
-            tabIndex={preview ? -1 : 0}
-            onChange={(event) => setDraft(event.target.value)}
-            onKeyDown={(event) => {
-              if (preview) return
-              if (event.nativeEvent.isComposing || event.keyCode === 229) return
-              if (event.key === 'Enter') {
-                event.preventDefault()
-                confirm()
-              }
-            }}
-          />
-          {preview ? null : (
-            <p className="spell-hint">
-              {current.kind === 'conj'
-                ? '写出这个变形。平假名也可以，空格不影响判断。'
-                : '汉字、平假名、片假名都可以，空格不影响判断。'}
-            </p>
-          )}
+          <Headword item={current} rate={rate} />
+          <p className="word-zh">{gloss}</p>
+          <JaFacts item={current} reveal rate={rate} />
+          <p className="spell-hint">
+            {current.kind === 'conj' ? '先看词典形和这个变形，再合上默写。' : '先读一遍，记住写法，再合上默写。'}
+          </p>
+          <JaSpellField inputRef={inputRef} draft={draft} setDraft={setDraft} confirm={confirm} preview label={spellLabel} />
         </div>
         <div className="words-bar">
-          {preview ? (
-            <button type="button" className="go" onClick={cover}>
-              合上，默写
-            </button>
-          ) : (
-            <>
-              <button type="button" className="ghost" onClick={() => grade(false)}>
-                不会
-              </button>
-              <button type="button" className="go" disabled={!draft.trim()} onClick={confirm}>
-                确认
-              </button>
-            </>
-          )}
+          <button type="button" className="go" onClick={cover}>
+            合上，默写
+          </button>
+        </div>
+      </>
+    )
+  } else {
+    const prompt = current.kind === 'conj' ? `写出${current.form.name}` : '看中文，写出日语'
+    const spellLabel = current.kind === 'conj' ? `默写${current.form.name}` : '默写日语'
+    const hint =
+      current.kind === 'conj'
+        ? '写出这个变形。平假名也可以，空格不影响判断。'
+        : '汉字、平假名、片假名都可以，空格不影响判断。'
+    body = (
+      <>
+        <div className="words-body recall-sheet">
+          <p className="meta">
+            {current.entry.level}
+            {current.kind === 'conj' ? ` · ${current.form.name}` : ''} · 第 {step + 1} / {queue.length} 个
+          </p>
+          <p className="prompt-label">{prompt}</p>
+          {current.kind === 'conj' ? (
+            <p className="lemma" lang="ja">
+              词典形 {current.entry.word}
+              {current.entry.reading && current.entry.reading !== current.entry.word ? `　${current.entry.reading}` : ''}
+            </p>
+          ) : null}
+          <JaFacts item={current} reveal={false} rate={rate} />
+        </div>
+        <div className="spell-dock">
+          <JaSpellField
+            inputRef={inputRef}
+            draft={draft}
+            setDraft={setDraft}
+            confirm={confirm}
+            preview={false}
+            label={spellLabel}
+          />
+          <p className="spell-hint">{hint}</p>
+        </div>
+        <div className="recall-spacer" aria-hidden="true" />
+        <div className="words-bar">
+          <button type="button" className="ghost" onClick={() => grade(false)}>
+            不会
+          </button>
+          <button type="button" className="go" disabled={!draft.trim()} onClick={confirm}>
+            确认
+          </button>
         </div>
       </>
     )
   }
 
-  return <section className="panel words ja">{body}</section>
+  return <section className={phase === 'recall' ? 'panel words ja recall' : 'panel words ja'}>{body}</section>
 }

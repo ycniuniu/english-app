@@ -84,6 +84,44 @@ button:active:not(:disabled) {
     var(--paper);
 }
 
+@media (max-width: 839px) {
+  html,
+  body {
+    overflow: hidden;
+  }
+
+  .app {
+    position: fixed;
+    top: var(--vv-offset, 0px);
+    left: 0;
+    right: 0;
+    height: var(--vv-height, 100dvh);
+    max-height: var(--vv-height, 100dvh);
+  }
+
+  html[data-keyboard] .nav,
+  html[data-keyboard] .top,
+  html[data-keyboard] .lang-switch,
+  html[data-keyboard] .recall-sheet .meta,
+  html[data-keyboard] .spell-dock .spell-hint {
+    display: none;
+  }
+
+  html[data-keyboard] .panel-wrap:not(.words-shell) {
+    padding-top: 8px;
+  }
+
+  html[data-keyboard] .words-bar {
+    padding-top: 6px;
+    padding-bottom: calc(6px + var(--safe-bottom));
+  }
+
+  html[data-keyboard] .words-bar .go,
+  html[data-keyboard] .words-bar .ghost {
+    min-height: 48px;
+  }
+}
+
 .top {
   padding: calc(12px + var(--safe-top)) 16px 10px;
 }
@@ -557,6 +595,91 @@ main {
   margin: 0 0 8px;
 }
 
+.word-facts.compact {
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.word-facts.compact .fact-label {
+  margin-bottom: 4px;
+}
+
+.sense-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  margin: 0;
+}
+
+.sense-row .sense {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  margin: 0;
+}
+
+.sense-row .sense-head {
+  gap: 4px;
+}
+
+.sense-row .sense-zh {
+  flex: none;
+  font-size: 18px;
+  line-height: 1.35;
+}
+
+.sense-row .sense:first-child .sense-zh {
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.sense-row.plain {
+  column-gap: 0;
+  row-gap: 4px;
+}
+
+.sense-row.plain .sense + .sense::before {
+  content: "·";
+  margin: 0 8px;
+  color: #a89880;
+  font-size: 16px;
+}
+
+.spell-dock {
+  flex: none;
+  padding: 0 16px 8px;
+}
+
+.spell-dock .spell {
+  margin-top: 0;
+}
+
+.spell-dock .spell-hint {
+  margin-top: 6px;
+}
+
+.words.recall .recall-sheet {
+  flex: 0 1 auto;
+}
+
+.recall-spacer {
+  display: block;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+@media (max-width: 839px) {
+  html[data-keyboard] .words.recall .recall-sheet {
+    flex: 1 1 auto;
+  }
+
+  html[data-keyboard] .words.recall .recall-spacer {
+    display: none;
+  }
+}
+
 .sense-head {
   display: flex;
   align-items: baseline;
@@ -848,6 +971,10 @@ main {
 .ja .sense-zh {
   flex: 1;
   min-width: 0;
+}
+
+.ja .sense-row .sense-zh {
+  flex: none;
 }
 
 .lemma,

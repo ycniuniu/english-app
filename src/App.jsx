@@ -87,17 +87,36 @@ export function App() {
 
   useEffect(() => {
     const viewport = window.visualViewport
+    const root = document.documentElement
     if (!viewport) return undefined
+    let full = Math.max(window.innerHeight, viewport.height)
+    let width = window.innerWidth
     const apply = () => {
-      const overlap = Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop)
-      document.documentElement.style.setProperty('--keyboard', `${Math.round(overlap)}px`)
+      const height = viewport.height
+      const offset = Math.max(0, viewport.offsetTop)
+      if (window.innerWidth !== width) {
+        width = window.innerWidth
+        full = Math.max(window.innerHeight, height + offset)
+      } else if (height >= full - 40) {
+        full = Math.max(window.innerHeight, height + offset)
+      }
+      const overlap = Math.max(0, window.innerHeight - height - offset)
+      const narrow = window.matchMedia('(max-width: 839px)').matches
+      const keyboard = narrow && (full - height > 120 || overlap > 80 || offset > 80)
+      root.style.setProperty('--keyboard', `${Math.round(overlap)}px`)
+      root.style.setProperty('--vv-offset', `${Math.round(offset)}px`)
+      root.style.setProperty('--vv-height', `${Math.round(height)}px`)
+      root.toggleAttribute('data-keyboard', keyboard)
     }
     viewport.addEventListener('resize', apply)
     viewport.addEventListener('scroll', apply)
+    window.addEventListener('resize', apply)
     apply()
     return () => {
       viewport.removeEventListener('resize', apply)
       viewport.removeEventListener('scroll', apply)
+      window.removeEventListener('resize', apply)
+      root.removeAttribute('data-keyboard')
     }
   }, [])
 

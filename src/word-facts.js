@@ -47,6 +47,27 @@ export function wordPosLabels(senses) {
   return concrete.length ? concrete : labels
 }
 
+export function recallGlosses(senses, headZh = '') {
+  const list = []
+  for (const sense of senses || []) {
+    const zh = String(sense?.zh || '').trim()
+    if (!zh) continue
+    list.push({ pos: sense.pos || '', zh })
+  }
+  const head = String(headZh || '').trim()
+  if (head && !list.some((item) => item.zh === head)) list.unshift({ pos: list[0]?.pos || '', zh: head })
+  return list
+}
+
+export function glossPosVaries(senses) {
+  const labels = []
+  for (const sense of senses || []) {
+    const label = broadPos(sense.pos)
+    if (label && !labels.includes(label)) labels.push(label)
+  }
+  return labels.length > 1
+}
+
 function pushForm(items, name, pos, word) {
   const text = String(word || '').trim()
   if (!text || text === '—') return

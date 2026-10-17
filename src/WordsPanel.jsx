@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { SpeakButton } from './SpeakButton.jsx'
 import { speakText, stopSpeech, useSpeech } from './speech.js'
-import { broadPos, describeForms, speakableParts, wordPosLabels } from './word-facts.js'
+import { broadPos, describeForms, glossPosVaries, recallGlosses, speakableParts, wordPosLabels } from './word-facts.js'
 import { readJson, writeJson } from './storage.js'
 import {
   NEW_BATCH,
@@ -59,12 +59,43 @@ function SpokenLine({ text, zh, id, rate, label, englishClass }) {
   )
 }
 
-function WordFacts({ detail, reveal, rate, speakId, headword }) {
+function SpellField({ inputRef, draft, setDraft, confirm, preview }) {
+  return (
+    <input
+      id="spell"
+      ref={inputRef}
+      className={preview ? 'spell spell-off' : 'spell'}
+      value={draft}
+      placeholder={preview ? '' : '在这里默写'}
+      autoCapitalize="none"
+      autoCorrect="off"
+      autoComplete="off"
+      spellCheck={false}
+      enterKeyHint="done"
+      aria-label="默写英文"
+      aria-hidden={preview}
+      tabIndex={preview ? -1 : 0}
+      onChange={(event) => setDraft(event.target.value)}
+      onKeyDown={(event) => {
+        if (preview) return
+        if (event.nativeEvent.isComposing || event.keyCode === 229) return
+        if (event.key === 'Enter') {
+          event.preventDefault()
+          confirm()
+        }
+      }}
+    />
+  )
+}
+
+function WordFacts({ detail, reveal, rate, speakId, headword, headZh }) {
   if (!detail) return null
   const forms = describeForms(detail.forms, detail.senses, headword)
   const labels = wordPosLabels(detail.senses)
+  const glosses = reveal ? detail.senses : recallGlosses(detail.senses, headZh)
+  const showSensePos = reveal || glossPosVaries(glosses)
   return (
-    <div className="word-facts">
+    <div className={reveal ? 'word-facts' : 'word-facts compact'}>
       {labels.length ? (
         <div className="fact-block">
           <p className="fact-label">词性</p>
@@ -96,28 +127,30 @@ function WordFacts({ detail, reveal, rate, speakId, headword }) {
       ) : null}
       <div className="fact-block">
         <p className="fact-label">{reveal ? '释义' : '同一个词的几条中文'}</p>
-        {detail.senses.map((sense, senseIndex) => (
-          <div key={`${sense.pos}-${sense.zh}`} className="sense">
-            <p className="sense-head">
-              <span className="sense-pos">{broadPos(sense.pos)}</span>
-              <span className="sense-zh">{sense.zh}</span>
-            </p>
-            {reveal
-              ? sense.examples.map(([en, zh], index) => (
-                  <div key={`${index}-${en}`} className="example">
-                    <SpokenLine
-                      text={en}
-                      zh={zh}
-                      id={`${speakId}-ex-${senseIndex}-${index}`}
-                      rate={rate}
-                      label="朗读这个例句"
-                      englishClass="example-en"
-                    />
-                  </div>
-                ))
-              : null}
-          </div>
-        ))}
+        <div className={reveal ? 'sense-stack' : showSensePos ? 'sense-row' : 'sense-row plain'} role={reveal ? undefined : 'list'}>
+          {glosses.map((sense, senseIndex) => (
+            <div key={`${senseIndex}-${sense.pos}-${sense.zh}`} className="sense" role={reveal ? undefined : 'listitem'}>
+              <p className="sense-head">
+                {showSensePos ? <span className="sense-pos">{broadPos(sense.pos)}</span> : null}
+                <span className="sense-zh">{sense.zh}</span>
+              </p>
+              {reveal
+                ? (sense.examples || []).map(([en, zh], index) => (
+                    <div key={`${index}-${en}`} className="example">
+                      <SpokenLine
+                        text={en}
+                        zh={zh}
+                        id={`${speakId}-ex-${senseIndex}-${index}`}
+                        rate={rate}
+                        label="朗读这个例句"
+                        englishClass="example-en"
+                      />
+                    </div>
+                  ))
+                : null}
+            </div>
+          ))}
+        </div>
       </div>
       {reveal ? (
         <div className="fact-block">
@@ -227,7 +260,7 @@ export function WordsPanel({ rate }) {
   }, [cards])
 
   useEffect(() => {
-    if (phase === 'recall') inputRef.current?.focus()
+    if (phase === 'recall') inputRef.current?.focus({ preventScroll: true })
   }, [phase, step])
 
   const total = words?.length ?? 0
@@ -256,7 +289,7 @@ export function WordsPanel({ rate }) {
     setDraft('')
     phaseRef.current = 'recall'
     setPhase('recall')
-    inputRef.current?.focus()
+    inputRef.current?.focus({ preventScroll: true })
   }
 
   function grade(correct) {
@@ -395,77 +428,63 @@ export function WordsPanel({ rate }) {
         </div>
       </>
     )
-  } else {
-    const preview = phase === 'preview'
+  } else if (phase === 'preview') {
     body = (
       <>
         <div className="words-body">
           <p className="meta">
             第 {step + 1} / {queue.length} 个
           </p>
-          {preview ? (
-            <>
-              <div className="word-en-row">
-                <p className="word-en">{current.word}</p>
-                <SpeakButton text={current.word} id={`word-${current.id}`} rate={rate} label="朗读这个单词" />
-              </div>
-              {current.phonetic ? <p className="word-ph">{current.phonetic}</p> : null}
-              <p className="word-zh">{current.zh}</p>
-              <WordFacts detail={current.detail} reveal rate={rate} speakId={`card-${current.id}`} headword={current.word} />
-              <p className="spell-hint">先读一遍，记住拼法，再合上默写。</p>
-            </>
-          ) : (
-            <>
-              <p className="prompt-label">看中文，写出英文</p>
-              <p className="word-zh">{current.zh}</p>
-              <WordFacts detail={current.detail} reveal={false} rate={rate} speakId={`card-${current.id}`} headword={current.word} />
-            </>
-          )}
-          <input
-            id="spell"
-            ref={inputRef}
-            className={preview ? 'spell spell-off' : 'spell'}
-            value={draft}
-            placeholder={preview ? '' : '在这里默写'}
-            autoCapitalize="none"
-            autoCorrect="off"
-            autoComplete="off"
-            spellCheck={false}
-            enterKeyHint="done"
-            aria-label="默写英文"
-            aria-hidden={preview}
-            tabIndex={preview ? -1 : 0}
-            onChange={(event) => setDraft(event.target.value)}
-            onKeyDown={(event) => {
-              if (preview) return
-              if (event.nativeEvent.isComposing || event.keyCode === 229) return
-              if (event.key === 'Enter') {
-                event.preventDefault()
-                confirm()
-              }
-            }}
-          />
-          {preview ? null : <p className="spell-hint">大小写和首尾空格不影响判断。</p>}
+          <div className="word-en-row">
+            <p className="word-en">{current.word}</p>
+            <SpeakButton text={current.word} id={`word-${current.id}`} rate={rate} label="朗读这个单词" />
+          </div>
+          {current.phonetic ? <p className="word-ph">{current.phonetic}</p> : null}
+          <p className="word-zh">{current.zh}</p>
+          <WordFacts detail={current.detail} reveal rate={rate} speakId={`card-${current.id}`} headword={current.word} />
+          <p className="spell-hint">先读一遍，记住拼法，再合上默写。</p>
+          <SpellField inputRef={inputRef} draft={draft} setDraft={setDraft} confirm={confirm} preview />
         </div>
         <div className="words-bar">
-          {preview ? (
-            <button type="button" className="go" onClick={cover}>
-              合上，默写
-            </button>
-          ) : (
-            <>
-              <button type="button" className="ghost" onClick={() => grade(false)}>
-                不会
-              </button>
-              <button type="button" className="go" disabled={!draft.trim()} onClick={confirm}>
-                确认
-              </button>
-            </>
-          )}
+          <button type="button" className="go" onClick={cover}>
+            合上，默写
+          </button>
+        </div>
+      </>
+    )
+  } else {
+    body = (
+      <>
+        <div className="words-body recall-sheet">
+          <p className="meta">
+            第 {step + 1} / {queue.length} 个
+          </p>
+          <p className="prompt-label">看中文，写出英文</p>
+          <WordFacts
+            detail={current.detail}
+            reveal={false}
+            rate={rate}
+            speakId={`card-${current.id}`}
+            headword={current.word}
+            headZh={current.zh}
+          />
+        </div>
+        <div className="spell-dock">
+          <SpellField inputRef={inputRef} draft={draft} setDraft={setDraft} confirm={confirm} preview={false} />
+          <p className="spell-hint">大小写和首尾空格不影响判断。</p>
+        </div>
+        <div className="recall-spacer" aria-hidden="true" />
+        <div className="words-bar">
+          <button type="button" className="ghost" onClick={() => grade(false)}>
+            不会
+          </button>
+          <button type="button" className="go" disabled={!draft.trim()} onClick={confirm}>
+            确认
+          </button>
         </div>
       </>
     )
   }
 
-  return <section className="panel words">{body}</section>
+  return <section className={phase === 'recall' ? 'panel words recall' : 'panel words'}>{body}</section>
 }
