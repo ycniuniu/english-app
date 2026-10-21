@@ -71,6 +71,20 @@ export function SpeakIcon() {
   )
 }
 
+export function ChatIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        d="M5.2 6.4h13.6a1.8 1.8 0 0 1 1.8 1.8v6.4a1.8 1.8 0 0 1-1.8 1.8H10l-3.4 2.8v-2.8H5.2a1.8 1.8 0 0 1-1.8-1.8V8.2a1.8 1.8 0 0 1 1.8-1.8z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}
+
 export function WordsIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">

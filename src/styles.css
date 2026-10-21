@@ -998,3 +998,153 @@ main {
     animation: none !important;
   }
 }
+
+.chat-panel {
+  min-height: 0;
+  padding: 0;
+}
+
+.chat-log {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 4px 14px 10px;
+}
+
+.chat-empty {
+  margin: auto 0;
+  padding: 18px 16px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--paper-2);
+  color: var(--ink-soft);
+  text-align: center;
+  line-height: 1.6;
+}
+
+.chat-row {
+  display: flex;
+  max-width: 100%;
+}
+
+.chat-row.user {
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.chat-row.assistant {
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.chat-bubble {
+  max-width: 88%;
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 16px;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.chat-row.user .chat-bubble {
+  background: var(--pine-gradient);
+  color: #fbf7f0;
+}
+
+.chat-row.assistant .chat-bubble {
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  box-shadow: var(--card-shadow);
+}
+
+.chat-fix {
+  width: 100%;
+  padding: 10px 12px 4px;
+  border: 1px solid #f0c7bc;
+  border-radius: 16px;
+  background: #fff8f5;
+}
+
+.chat-fix-title {
+  margin: 0 0 4px;
+  color: var(--cinnabar);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.chat-fix-item {
+  padding: 6px 0 8px;
+  border-top: 1px solid #f3ddd6;
+}
+
+.chat-fix-item p {
+  margin: 4px 0;
+  line-height: 1.5;
+}
+
+.chat-fix b {
+  display: inline-block;
+  min-width: 4.5em;
+  margin-right: 6px;
+  color: var(--cinnabar-2);
+  font-size: 13px;
+}
+
+.chat-fix-en {
+  overflow-wrap: anywhere;
+}
+
+.chat-mark {
+  padding: 0 2px;
+  border-radius: 4px;
+  background: #f6c7bb;
+  color: #6e2a1c;
+}
+
+.chat-dock {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 14px 10px;
+  border-top: 1px solid var(--line);
+  background: rgba(244, 239, 228, 0.96);
+}
+
+.chat-dock textarea {
+  width: 100%;
+  min-height: 72px;
+  max-height: 120px;
+  padding: 12px;
+  border: 1px solid #d9cbb8;
+  border-radius: 16px;
+  background: white;
+  box-shadow: var(--card-shadow);
+  font-size: 16px;
+  line-height: 1.5;
+  resize: none;
+}
+
+.chat-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.chat-actions .ghost,
+.chat-actions .go {
+  width: auto;
+  flex: 1;
+}
+
+.chat-note {
+  margin: 0;
+  color: #6e2a1c;
+  font-size: 14px;
+}
