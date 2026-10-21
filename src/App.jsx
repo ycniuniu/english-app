@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { SpeakIcon, TranslateIcon, WordsIcon } from './icons.jsx'
+import { ChatPanel } from './ChatPanel.jsx'
+import { ChatIcon, SpeakIcon, TranslateIcon, WordsIcon } from './icons.jsx'
 import { JaPanel } from './JaPanel.jsx'
 import { japanesePhrase } from './voice.js'
 import { ReaderPanel } from './ReaderPanel.jsx'
@@ -22,6 +23,7 @@ function loadRate() {
 
 function loadTab() {
   const saved = readString('kaikou.tab.v1', 'translate')
+  if (saved === 'chat') return 'chat'
   if (saved === 'speak' || saved === 'read') return 'speak'
   if (saved === 'words' || saved === 'ja') return 'words'
   return 'translate'
@@ -147,6 +149,9 @@ export function App() {
         <div className={tab === 'speak' ? 'panel-wrap' : 'panel-wrap hidden'}>
           <ReaderPanel rate={rate} rateLabel={rateItem.label} onCycleRate={cycleRate} />
         </div>
+        <div className={tab === 'chat' ? 'panel-wrap' : 'panel-wrap hidden'}>
+          <ChatPanel rate={rate} />
+        </div>
         {studyOn ? (
           <div className={tab === 'words' ? 'panel-wrap words-shell' : 'panel-wrap words-shell hidden'}>
             <div className="lang-switch" role="radiogroup" aria-label="词表语言">
@@ -182,6 +187,10 @@ export function App() {
         <button type="button" aria-current={tab === 'words' ? 'page' : undefined} onClick={() => selectTab('words')}>
           <WordsIcon />
           单词
+        </button>
+        <button type="button" aria-current={tab === 'chat' ? 'page' : undefined} onClick={() => selectTab('chat')}>
+          <ChatIcon />
+          聊天
         </button>
       </nav>
       <p className="sr" aria-live="polite">
