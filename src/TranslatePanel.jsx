@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { SpeakButton } from './SpeakButton.jsx'
 import { readJson, writeJson } from './storage.js'
-import { translateText, translationDirection } from './translate.js'
+import { pronounceText, translateText, translationDirection } from './translate.js'
 
 const MAX = 4000
 const STORAGE_KEY = 'kaikou.translate.v1'
@@ -60,8 +60,10 @@ export function TranslatePanel({ rate }) {
     }
   }
 
+  const spoken = result ? pronounceText(source, result, english) : ''
+
   return (
-    <section className="panel translate">
+    <section className={result ? 'panel translate has-result' : 'panel translate'}>
       <label className="sr" htmlFor="source">
         要翻译的文字
       </label>
@@ -96,7 +98,13 @@ export function TranslatePanel({ rate }) {
             <p className={english ? 'en' : 'zh'} lang={english ? 'en' : 'zh-CN'}>
               {result}
             </p>
-            {english ? <SpeakButton text={result} id="translate" rate={rate} label="朗读译文" /> : null}
+            <SpeakButton
+              text={spoken}
+              id="translate"
+              rate={rate}
+              label={english ? '朗读译文' : '朗读英文'}
+              caption="发音"
+            />
           </div>
         </div>
       ) : null}

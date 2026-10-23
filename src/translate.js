@@ -3,6 +3,10 @@ import { splitSentences } from './text.js'
 const ENDPOINT = 'https://api.mymemory.translated.net/get'
 const DEFAULT_MAX_BYTES = 450
 
+export function pronounceText(source, result, english) {
+  return String((english ? result : source) ?? '').trim()
+}
+
 export function translationDirection(text) {
   const cjk = (String(text).match(/[\u4e00-\u9fff]/g) || []).length
   const latin = (String(text).match(/[A-Za-z]/g) || []).length

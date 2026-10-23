@@ -1,5 +1,7 @@
-import { useEffect, useRef, useState } from 'react'
+import { memo, useEffect, useRef, useState } from 'react'
+import { flushSync } from 'react-dom'
 import { SpeakButton } from './SpeakButton.jsx'
+import { SpellDock, focusSpellInput } from './SpellDock.jsx'
 import { speakText, stopSpeech, useSpeech } from './speech.js'
 import { broadPos, describeForms, glossPosVaries, recallGlosses, speakableParts, wordPosLabels } from './word-facts.js'
 import { readJson, writeJson } from './storage.js'
@@ -17,9 +19,7 @@ import {
   todayKey,
 } from './srs.js'
 
-function WordTap({ text, speak, id, rate }) {
-  const speech = useSpeech()
-  const active = speech.status === 'speaking' && speech.id === id
+function WordTap({ text, speak, id, rate, active }) {
   return (
     <button
       type="button"
@@ -36,9 +36,18 @@ function WordTap({ text, speak, id, rate }) {
 }
 
 function SpeakableEnglish({ text, id, rate }) {
+  const speech = useSpeech()
+  const activeId = speech.status === 'speaking' ? speech.id : ''
   return speakableParts(text).map((part, index) =>
     part.clickable ? (
-      <WordTap key={`${index}-${part.speak}`} text={part.text} speak={part.speak} id={`${id}-w-${index}`} rate={rate} />
+      <WordTap
+        key={`${index}-${part.speak}`}
+        text={part.text}
+        speak={part.speak}
+        id={`${id}-w-${index}`}
+        rate={rate}
+        active={activeId === `${id}-w-${index}`}
+      />
     ) : (
       <span key={`${index}-${part.text}`}>{part.text}</span>
     ),
@@ -59,36 +68,7 @@ function SpokenLine({ text, zh, id, rate, label, englishClass }) {
   )
 }
 
-function SpellField({ inputRef, draft, setDraft, confirm, preview }) {
-  return (
-    <input
-      id="spell"
-      ref={inputRef}
-      className={preview ? 'spell spell-off' : 'spell'}
-      value={draft}
-      placeholder={preview ? '' : '在这里默写'}
-      autoCapitalize="none"
-      autoCorrect="off"
-      autoComplete="off"
-      spellCheck={false}
-      enterKeyHint="done"
-      aria-label="默写英文"
-      aria-hidden={preview}
-      tabIndex={preview ? -1 : 0}
-      onChange={(event) => setDraft(event.target.value)}
-      onKeyDown={(event) => {
-        if (preview) return
-        if (event.nativeEvent.isComposing || event.keyCode === 229) return
-        if (event.key === 'Enter') {
-          event.preventDefault()
-          confirm()
-        }
-      }}
-    />
-  )
-}
-
-function WordFacts({ detail, reveal, rate, speakId, headword, headZh }) {
+const WordFacts = memo(function WordFacts({ detail, reveal, rate, speakId, headword, headZh }) {
   if (!detail) return null
   const forms = describeForms(detail.forms, detail.senses, headword)
   const labels = wordPosLabels(detail.senses)
@@ -173,7 +153,7 @@ function WordFacts({ detail, reveal, rate, speakId, headword, headZh }) {
       ) : null}
     </div>
   )
-}
+})
 
 function percent(part, total) {
   if (!total || !part) return '0%'
@@ -219,11 +199,9 @@ export function WordsPanel({ rate }) {
   const [queue, setQueue] = useState(null)
   const [step, setStep] = useState(0)
   const [phase, setPhase] = useState('home')
-  const [draft, setDraft] = useState('')
   const [typed, setTyped] = useState('')
   const [result, setResult] = useState(null)
   const [missRound, setMissRound] = useState(false)
-  const inputRef = useRef(null)
   const phaseRef = useRef('home')
   const today = todayKey()
 
@@ -259,10 +237,6 @@ export function WordsPanel({ rate }) {
     writeJson(STORAGE_KEY, { cards })
   }, [cards])
 
-  useEffect(() => {
-    if (phase === 'recall') inputRef.current?.focus({ preventScroll: true })
-  }, [phase, step])
-
   const total = words?.length ?? 0
   const stats = summarize(cards, total, today)
   const current = queue && words ? words[queue[step]] : null
@@ -275,37 +249,36 @@ export function WordsPanel({ rate }) {
     const first = cardOf(cards, next[0])
     const nextPhase = needsPreview(first) ? 'preview' : 'recall'
     phaseRef.current = nextPhase
-    setQueue(next)
-    setStep(0)
-    setDraft('')
-    setTyped('')
-    setResult(null)
-    setPhase(nextPhase)
-    if (newBatch > 0) setMissRound(false)
+    const apply = () => {
+      setQueue(next)
+      setStep(0)
+      setTyped('')
+      setResult(null)
+      setPhase(nextPhase)
+      if (newBatch > 0) setMissRound(false)
+    }
+    if (nextPhase === 'recall') {
+      flushSync(apply)
+      focusSpellInput('spell')
+    } else apply()
   }
 
   function cover() {
     stopSpeech()
-    setDraft('')
     phaseRef.current = 'recall'
-    setPhase('recall')
-    inputRef.current?.focus({ preventScroll: true })
+    flushSync(() => setPhase('recall'))
+    focusSpellInput('spell')
   }
 
-  function grade(correct) {
+  function grade(correct, typedText = '') {
     if (!current || phaseRef.current === 'result') return
     phaseRef.current = 'result'
     const graded = gradeCard(cardOf(cards, current.id), correct, today)
     setCards((prev) => ({ ...prev, [String(current.id)]: graded }))
-    setTyped(draft)
+    setTyped(typedText)
     setResult({ correct, card: graded })
     setPhase('result')
     stopSpeech()
-  }
-
-  function confirm() {
-    if (!current || !draft.trim()) return
-    grade(answersMatch(draft, current.word))
   }
 
   function goNext() {
@@ -317,16 +290,21 @@ export function WordsPanel({ rate }) {
       setPhase('home')
       setMissRound(true)
       setResult(null)
-      setDraft('')
       return
     }
     const nextCard = cardOf(cards, queue[nextStep])
-    phaseRef.current = needsPreview(nextCard) ? 'preview' : 'recall'
-    setStep(nextStep)
-    setDraft('')
-    setTyped('')
-    setResult(null)
-    setPhase(phaseRef.current)
+    const nextPhase = needsPreview(nextCard) ? 'preview' : 'recall'
+    phaseRef.current = nextPhase
+    const apply = () => {
+      setStep(nextStep)
+      setTyped('')
+      setResult(null)
+      setPhase(nextPhase)
+    }
+    if (nextPhase === 'recall') {
+      flushSync(apply)
+      focusSpellInput('spell')
+    } else apply()
   }
 
   const freshBatch = Math.min(NEW_BATCH, stats.fresh)
@@ -443,7 +421,6 @@ export function WordsPanel({ rate }) {
           <p className="word-zh">{current.zh}</p>
           <WordFacts detail={current.detail} reveal rate={rate} speakId={`card-${current.id}`} headword={current.word} />
           <p className="spell-hint">先读一遍，记住拼法，再合上默写。</p>
-          <SpellField inputRef={inputRef} draft={draft} setDraft={setDraft} confirm={confirm} preview />
         </div>
         <div className="words-bar">
           <button type="button" className="go" onClick={cover}>
@@ -469,19 +446,15 @@ export function WordsPanel({ rate }) {
             headZh={current.zh}
           />
         </div>
-        <div className="spell-dock">
-          <SpellField inputRef={inputRef} draft={draft} setDraft={setDraft} confirm={confirm} preview={false} />
-          <p className="spell-hint">大小写和首尾空格不影响判断。</p>
-        </div>
-        <div className="recall-spacer" aria-hidden="true" />
-        <div className="words-bar">
-          <button type="button" className="ghost" onClick={() => grade(false)}>
-            不会
-          </button>
-          <button type="button" className="go" disabled={!draft.trim()} onClick={confirm}>
-            确认
-          </button>
-        </div>
+        <SpellDock
+          key={`${current.id}:${step}`}
+          wordKey={`${current.id}:${step}`}
+          hint="大小写和首尾空格不影响判断。"
+          label="默写英文"
+          lang="en"
+          onConfirm={(text) => grade(answersMatch(text, current.word), text)}
+          onSkip={(text) => grade(false, text)}
+        />
       </>
     )
   }
