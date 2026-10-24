@@ -1,13 +1,21 @@
 {
   "name": "开口",
   "short_name": "开口",
+  "description": "翻译、跟读、记单词",
   "lang": "zh-CN",
+  "id": "/",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "background_color": "#f4efe4",
   "theme_color": "#f4efe4",
   "icons": [
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    },
     {
       "src": "/icon-192.png",
       "sizes": "192x192",
@@ -17,12 +25,6 @@
     {
       "src": "/icon-512.png",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/apple-touch-icon.png",
-      "sizes": "180x180",
       "type": "image/png",
       "purpose": "any"
     }
