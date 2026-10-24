@@ -55,6 +55,15 @@ test('desktop and a closed keyboard do not mark the keyboard open', () => {
   )
 })
 
+test('translate source stays a few lines tall instead of filling the screen', () => {
+  const css = readFileSync(new URL('../src/styles.css', import.meta.url), 'utf8')
+  const block = css.match(/\.translate textarea \{[^}]+\}/)?.[0] || ''
+  assert.match(block, /flex:\s*none/)
+  const min = Number(block.match(/min-height:\s*(\d+)px/)?.[1])
+  assert.ok(min >= 64 && min <= 96)
+  assert.doesNotMatch(block, /flex:\s*1\b/)
+})
+
 test('dictation input stays at least 16px so iOS Safari does not zoom on focus', () => {
   const css = readFileSync(new URL('../src/styles.css', import.meta.url), 'utf8')
   const block = css.match(/\.spell \{[^}]*font-size:\s*(\d+)px/)

@@ -26,7 +26,17 @@ export function TranslatePanel({ rate }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const abortRef = useRef(null)
+  const sourceRef = useRef(null)
   const direction = useMemo(() => (source.trim() ? translationDirection(source) : null), [source])
+
+  useEffect(() => {
+    const field = sourceRef.current
+    if (!field) return
+    field.style.height = '0px'
+    const max = Number.parseFloat(getComputedStyle(field).maxHeight) || 220
+    const next = Math.min(Math.max(field.scrollHeight, 76), max)
+    field.style.height = `${next}px`
+  }, [source, result])
 
   useEffect(() => {
     writeJson(STORAGE_KEY, { source, result, label, english })
@@ -69,7 +79,9 @@ export function TranslatePanel({ rate }) {
       </label>
       <textarea
         id="source"
+        ref={sourceRef}
         value={source}
+        rows={2}
         maxLength={MAX}
         placeholder="输入中文或英文，点翻译。"
         spellCheck="true"

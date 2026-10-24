@@ -331,24 +331,25 @@ main {
 }
 
 .translate textarea {
-  flex: 1;
-  min-height: 120px;
+  flex: none;
   width: 100%;
-  padding: 14px;
+  min-height: 76px;
+  max-height: min(34vh, 220px);
+  height: 76px;
+  padding: 12px 14px;
   border: 1px solid #d9cbb8;
   border-radius: 16px;
   background: white;
   box-shadow: var(--card-shadow);
   font-size: 16px;
-  line-height: 1.55;
+  line-height: 1.45;
   resize: none;
+  overflow-y: auto;
   overscroll-behavior: contain;
 }
 
 .translate.has-result textarea {
-  flex: 0 1 auto;
-  min-height: 72px;
-  max-height: 28vh;
+  max-height: min(22vh, 140px);
 }
 
 .translate .go,
