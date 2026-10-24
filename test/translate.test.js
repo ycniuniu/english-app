@@ -1,6 +1,11 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { packForTranslation, parseMyMemory, translateText, translationDirection } from '../src/translate.js'
+import { packForTranslation, parseMyMemory, pronounceText, translateText, translationDirection } from '../src/translate.js'
+
+test('pronunciation uses the English side already on screen', () => {
+  assert.equal(pronounceText('你好', 'Hello', true), 'Hello')
+  assert.equal(pronounceText('Hello there', '你好', false), 'Hello there')
+})
 
 test('picks the translation direction from the letters in the text', () => {
   assert.deepEqual(translationDirection('你好'), {

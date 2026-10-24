@@ -1,7 +1,9 @@
-import { useEffect, useRef, useState } from 'react'
+import { memo, useEffect, useRef, useState } from 'react'
+import { flushSync } from 'react-dom'
 import { answersMatchJa } from './ja-answer.js'
 import { cardItem, JA_STORAGE_KEY, loadJaProgress, trackIds } from './ja-progress.js'
 import { SpeakButton } from './SpeakButton.jsx'
+import { SpellDock, focusSpellInput } from './SpellDock.jsx'
 import { stopSpeech } from './speech.js'
 import { readJson, writeJson } from './storage.js'
 import {
@@ -43,37 +45,7 @@ function JaLine({ text, zh, id, rate, label }) {
   )
 }
 
-function JaSpellField({ inputRef, draft, setDraft, confirm, preview, label }) {
-  return (
-    <input
-      id="ja-spell"
-      ref={inputRef}
-      className={preview ? 'spell spell-off' : 'spell'}
-      lang="ja"
-      value={draft}
-      placeholder={preview ? '' : '在这里默写'}
-      autoCapitalize="none"
-      autoCorrect="off"
-      autoComplete="off"
-      spellCheck={false}
-      enterKeyHint="done"
-      aria-label={label}
-      aria-hidden={preview}
-      tabIndex={preview ? -1 : 0}
-      onChange={(event) => setDraft(event.target.value)}
-      onKeyDown={(event) => {
-        if (preview) return
-        if (event.nativeEvent.isComposing || event.keyCode === 229) return
-        if (event.key === 'Enter') {
-          event.preventDefault()
-          confirm()
-        }
-      }}
-    />
-  )
-}
-
-function JaFacts({ item, reveal, rate }) {
+const JaFacts = memo(function JaFacts({ item, reveal, rate }) {
   const entry = item.entry
   const labels = entry.pos || []
   const speakId = `ja-${item.key}`
@@ -193,7 +165,7 @@ function JaFacts({ item, reveal, rate }) {
       ) : null}
     </div>
   )
-}
+})
 
 function percent(part, total) {
   if (!total || !part) return '0%'
@@ -286,11 +258,9 @@ export function JaPanel({ rate }) {
   const [queue, setQueue] = useState(null)
   const [step, setStep] = useState(0)
   const [phase, setPhase] = useState('home')
-  const [draft, setDraft] = useState('')
   const [typed, setTyped] = useState('')
   const [result, setResult] = useState(null)
   const [missRound, setMissRound] = useState(false)
-  const inputRef = useRef(null)
   const phaseRef = useRef('home')
   const today = todayKey()
 
@@ -318,10 +288,6 @@ export function JaPanel({ rate }) {
     writeJson(JA_STORAGE_KEY, { cards })
   }, [cards])
 
-  useEffect(() => {
-    if (phase === 'recall') inputRef.current?.focus({ preventScroll: true })
-  }, [phase, step])
-
   const words = pack?.words || null
   const ids = words ? trackIds(words, track) : []
   const stats = summarizeIds(cards, ids, today)
@@ -336,7 +302,6 @@ export function JaPanel({ rate }) {
     setPhase('home')
     setMissRound(false)
     setResult(null)
-    setDraft('')
     setTyped('')
   }
 
@@ -348,37 +313,36 @@ export function JaPanel({ rate }) {
     const first = cardOf(cards, next[0])
     const nextPhase = needsPreview(first) ? 'preview' : 'recall'
     phaseRef.current = nextPhase
-    setQueue(next)
-    setStep(0)
-    setDraft('')
-    setTyped('')
-    setResult(null)
-    setPhase(nextPhase)
-    if (newBatch > 0) setMissRound(false)
+    const apply = () => {
+      setQueue(next)
+      setStep(0)
+      setTyped('')
+      setResult(null)
+      setPhase(nextPhase)
+      if (newBatch > 0) setMissRound(false)
+    }
+    if (nextPhase === 'recall') {
+      flushSync(apply)
+      focusSpellInput('ja-spell')
+    } else apply()
   }
 
   function cover() {
     stopSpeech()
-    setDraft('')
     phaseRef.current = 'recall'
-    setPhase('recall')
-    inputRef.current?.focus({ preventScroll: true })
+    flushSync(() => setPhase('recall'))
+    focusSpellInput('ja-spell')
   }
 
-  function grade(correct) {
+  function grade(correct, typedText = '') {
     if (!current || phaseRef.current === 'result') return
     phaseRef.current = 'result'
     const graded = gradeCard(cardOf(cards, current.key), correct, today)
     setCards((prev) => ({ ...prev, [current.key]: graded }))
-    setTyped(draft)
+    setTyped(typedText)
     setResult({ correct, card: graded })
     setPhase('result')
     stopSpeech()
-  }
-
-  function confirm() {
-    if (!current || !draft.trim()) return
-    grade(answersMatchJa(draft, current.answers))
   }
 
   function goNext() {
@@ -390,16 +354,21 @@ export function JaPanel({ rate }) {
       setPhase('home')
       setMissRound(true)
       setResult(null)
-      setDraft('')
       return
     }
     const nextCard = cardOf(cards, queue[nextStep])
-    phaseRef.current = needsPreview(nextCard) ? 'preview' : 'recall'
-    setStep(nextStep)
-    setDraft('')
-    setTyped('')
-    setResult(null)
-    setPhase(phaseRef.current)
+    const nextPhase = needsPreview(nextCard) ? 'preview' : 'recall'
+    phaseRef.current = nextPhase
+    const apply = () => {
+      setStep(nextStep)
+      setTyped('')
+      setResult(null)
+      setPhase(nextPhase)
+    }
+    if (nextPhase === 'recall') {
+      flushSync(apply)
+      focusSpellInput('ja-spell')
+    } else apply()
   }
 
   const freshBatch = Math.min(NEW_BATCH, stats.fresh)
@@ -520,7 +489,6 @@ export function JaPanel({ rate }) {
     )
   } else if (phase === 'preview') {
     const gloss = current.entry.senses?.[0]?.zh || ''
-    const spellLabel = current.kind === 'conj' ? `默写${current.form.name}` : '默写日语'
     body = (
       <>
         <div className="words-body">
@@ -534,7 +502,6 @@ export function JaPanel({ rate }) {
           <p className="spell-hint">
             {current.kind === 'conj' ? '先看词典形和这个变形，再合上默写。' : '先读一遍，记住写法，再合上默写。'}
           </p>
-          <JaSpellField inputRef={inputRef} draft={draft} setDraft={setDraft} confirm={confirm} preview label={spellLabel} />
         </div>
         <div className="words-bar">
           <button type="button" className="go" onClick={cover}>
@@ -566,26 +533,16 @@ export function JaPanel({ rate }) {
           ) : null}
           <JaFacts item={current} reveal={false} rate={rate} />
         </div>
-        <div className="spell-dock">
-          <JaSpellField
-            inputRef={inputRef}
-            draft={draft}
-            setDraft={setDraft}
-            confirm={confirm}
-            preview={false}
-            label={spellLabel}
-          />
-          <p className="spell-hint">{hint}</p>
-        </div>
-        <div className="recall-spacer" aria-hidden="true" />
-        <div className="words-bar">
-          <button type="button" className="ghost" onClick={() => grade(false)}>
-            不会
-          </button>
-          <button type="button" className="go" disabled={!draft.trim()} onClick={confirm}>
-            确认
-          </button>
-        </div>
+        <SpellDock
+          key={`${current.key}:${step}`}
+          wordKey={`${current.key}:${step}`}
+          inputId="ja-spell"
+          label={spellLabel}
+          lang="ja"
+          hint={hint}
+          onConfirm={(text) => grade(answersMatchJa(text, current.answers), text)}
+          onSkip={(text) => grade(false, text)}
+        />
       </>
     )
   }

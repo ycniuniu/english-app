@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
-import { SpeakIcon, TranslateIcon, WordsIcon } from './icons.jsx'
+import { TranslateIcon, WordsIcon } from './icons.jsx'
+import { IosInstallTip } from './IosInstallTip.jsx'
 import { JaPanel } from './JaPanel.jsx'
 import { japanesePhrase } from './voice.js'
-import { ReaderPanel } from './ReaderPanel.jsx'
 import { stopSpeech, useSpeech } from './speech.js'
 import { readString, writeString } from './storage.js'
 import { TranslatePanel } from './TranslatePanel.jsx'
+import { frameForViewport, pinDocumentScroll } from './viewport.js'
 import { voicePhrase } from './voice.js'
 import { WordsPanel } from './WordsPanel.jsx'
 
@@ -22,7 +23,6 @@ function loadRate() {
 
 function loadTab() {
   const saved = readString('kaikou.tab.v1', 'translate')
-  if (saved === 'speak' || saved === 'read') return 'speak'
   if (saved === 'words' || saved === 'ja') return 'words'
   return 'translate'
 }
@@ -91,31 +91,53 @@ export function App() {
     if (!viewport) return undefined
     let full = Math.max(window.innerHeight, viewport.height)
     let width = window.innerWidth
+    let last = ''
+    let raf = 0
+    let pinnedAt = 0
     const apply = () => {
+      raf = 0
+      const offset = Math.max(0, viewport.offsetTop || 0)
       const height = viewport.height
-      const offset = Math.max(0, viewport.offsetTop)
       if (window.innerWidth !== width) {
         width = window.innerWidth
         full = Math.max(window.innerHeight, height + offset)
-      } else if (height >= full - 40) {
+      } else if (height + offset >= full - 40) {
         full = Math.max(window.innerHeight, height + offset)
       }
-      const overlap = Math.max(0, window.innerHeight - height - offset)
       const narrow = window.matchMedia('(max-width: 839px)').matches
-      const keyboard = narrow && (full - height > 120 || overlap > 80 || offset > 80)
-      root.style.setProperty('--keyboard', `${Math.round(overlap)}px`)
-      root.style.setProperty('--vv-offset', `${Math.round(offset)}px`)
-      root.style.setProperty('--vv-height', `${Math.round(height)}px`)
-      root.toggleAttribute('data-keyboard', keyboard)
+      if (narrow && (window.scrollX || window.scrollY) && performance.now() - pinnedAt > 300) {
+        pinnedAt = performance.now()
+        pinDocumentScroll()
+      }
+      const frame = frameForViewport({
+        innerWidth: window.innerWidth,
+        innerHeight: window.innerHeight,
+        vvHeight: height,
+        vvOffsetTop: viewport.offsetTop || 0,
+        fullHeight: full,
+        narrow,
+      })
+      const signature = `${frame.keyboard}|${frame.offsetTop}|${frame.height}|${frame.keyboardPx}`
+      if (signature === last) return
+      last = signature
+      root.style.setProperty('--keyboard', `${frame.keyboardPx}px`)
+      root.style.setProperty('--vv-offset', `${frame.offsetTop}px`)
+      root.style.setProperty('--vv-height', `${frame.height}px`)
+      root.toggleAttribute('data-keyboard', frame.keyboard)
     }
-    viewport.addEventListener('resize', apply)
-    viewport.addEventListener('scroll', apply)
-    window.addEventListener('resize', apply)
-    apply()
+    const schedule = () => {
+      if (raf) return
+      raf = window.requestAnimationFrame(apply)
+    }
+    viewport.addEventListener('resize', schedule)
+    viewport.addEventListener('scroll', schedule)
+    window.addEventListener('resize', schedule)
+    schedule()
     return () => {
-      viewport.removeEventListener('resize', apply)
-      viewport.removeEventListener('scroll', apply)
-      window.removeEventListener('resize', apply)
+      viewport.removeEventListener('resize', schedule)
+      viewport.removeEventListener('scroll', schedule)
+      window.removeEventListener('resize', schedule)
+      if (raf) window.cancelAnimationFrame(raf)
       root.removeAttribute('data-keyboard')
     }
   }, [])
@@ -125,7 +147,12 @@ export function App() {
       <header className="top">
         <div className="title-row">
           <h1>开口</h1>
-          <span className="badge">{voiceLabel}</span>
+          <div className="title-tools">
+            <button type="button" className="rate-cycle" onClick={cycleRate} aria-label={`语速${rateItem.label}，点击切换`}>
+              {rateItem.label}
+            </button>
+            <span className="badge">{voiceLabel}</span>
+          </div>
         </div>
       </header>
       {speech.status === 'speaking' ? <div className="speaking-bar" /> : null}
@@ -139,13 +166,11 @@ export function App() {
           请先运行 npm run dev，再用浏览器打开终端里的地址。
         </p>
       ) : null}
+      <IosInstallTip />
 
       <main>
         <div className={tab === 'translate' ? 'panel-wrap' : 'panel-wrap hidden'}>
           <TranslatePanel rate={rate} />
-        </div>
-        <div className={tab === 'speak' ? 'panel-wrap' : 'panel-wrap hidden'}>
-          <ReaderPanel rate={rate} rateLabel={rateItem.label} onCycleRate={cycleRate} />
         </div>
         {studyOn ? (
           <div className={tab === 'words' ? 'panel-wrap words-shell' : 'panel-wrap words-shell hidden'}>
@@ -174,10 +199,6 @@ export function App() {
         <button type="button" aria-current={tab === 'translate' ? 'page' : undefined} onClick={() => selectTab('translate')}>
           <TranslateIcon />
           翻译
-        </button>
-        <button type="button" aria-current={tab === 'speak' ? 'page' : undefined} onClick={() => selectTab('speak')}>
-          <SpeakIcon />
-          发音
         </button>
         <button type="button" aria-current={tab === 'words' ? 'page' : undefined} onClick={() => selectTab('words')}>
           <WordsIcon />
