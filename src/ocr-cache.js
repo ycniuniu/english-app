@@ -36,9 +36,16 @@ export async function fetchWithAssetCache(input, init, { fetchImpl = fetch, cach
   const response = await fetchImpl(input, init)
   if (cache && response?.ok && typeof response.clone === 'function') {
     try {
-      await cache.put(url, response.clone())
+      const copy = response.clone()
+      // Do not await. Safari can leave cache.put pending on a multi-megabyte
+      // model, which would keep the status on "正在下载" and never start OCR.
+      Promise.resolve()
+        .then(() => cache.put(url, copy))
+        .catch(() => {
+          // Quota or private mode. This response is still usable.
+        })
     } catch {
-      // Quota or private mode. The response is still usable this time.
+      // A body that cannot be cloned is still returned to the caller.
     }
   }
   return response

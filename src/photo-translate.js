@@ -27,9 +27,13 @@ export async function translatePhotoLines(lines, options = {}) {
       })
     } catch (error) {
       if (error?.name === 'AbortError') throw error
+      rows.push({ source, zh: '', script: direction.script })
       return { ok: false, error: OFFLINE, rows }
     }
-    if (!result?.ok) return { ok: false, error: result?.error || OFFLINE, rows }
+    if (!result?.ok) {
+      rows.push({ source, zh: '', script: direction.script })
+      return { ok: false, error: result?.error || OFFLINE, rows }
+    }
     rows.push({ source, zh: result.text, script: direction.script })
   }
   return { ok: true, rows }

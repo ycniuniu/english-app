@@ -42,8 +42,10 @@ function loadEngine(fetchImpl, urls) {
         textRecognitionModelAsset: { url: urls[1] },
         fetch: fetchImpl,
         ortOptions: {
-          // One thread. Multi-thread wasm needs cross-origin isolation headers,
-          // and this site does not change its hosting config.
+          // This package only publishes the threaded wasm build. Keys must be
+          // wasm and mjs (onnxruntime-web 1.24 and 1.31). Filename keys are ignored.
+          // One thread, proxy off: no workers, and no COOP/COEP headers.
+          // The glue's 4 GiB shared-memory maximum is capped at build time.
           backend: 'wasm',
           numThreads: 1,
           simd: true,
@@ -88,8 +90,14 @@ export async function recognizePhoto(file, { signal, onProgress } = {}) {
     error.name = 'AbortError'
     throw error
   }
-  onProgress?.({ phase: 'recognize' })
+  onProgress?.({ phase: 'prepare' })
   const engine = await loadEngine(fetchImpl, urls)
+  if (signal?.aborted) {
+    const error = new Error('aborted')
+    error.name = 'AbortError'
+    throw error
+  }
+  onProgress?.({ phase: 'recognize' })
   const results = await engine.predict(file)
   const first = Array.isArray(results) ? results[0] : results
   return linesFromOcrItems(first?.items || [])
