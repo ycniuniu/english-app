@@ -92,11 +92,23 @@ export function parseMyMemory(data) {
   return { ok: true, text }
 }
 
-export async function translateText(text, { fetchImpl = fetch, signal, maxBytes = DEFAULT_MAX_BYTES } = {}) {
+function resolveDirection(text, override) {
+  if (override && typeof override.from === 'string' && typeof override.to === 'string') {
+    return {
+      from: override.from,
+      to: override.to,
+      english: Boolean(override.english),
+      label: typeof override.label === 'string' ? override.label : '',
+    }
+  }
+  return translationDirection(text)
+}
+
+export async function translateText(text, { fetchImpl = fetch, signal, maxBytes = DEFAULT_MAX_BYTES, direction: directionOverride } = {}) {
   const trimmed = String(text ?? '').trim()
   if (!trimmed) return { ok: false, error: '请先输入要翻译的内容。' }
 
-  const direction = translationDirection(trimmed)
+  const direction = resolveDirection(trimmed, directionOverride)
   const chunks = packForTranslation(trimmed, maxBytes)
   const pieces = []
 

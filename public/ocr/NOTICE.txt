@@ -1,0 +1,4 @@
+文字识别模型来自 PaddleOCR 官方发布的移动端推理包，许可为 Apache-2.0。
+检测：PP-OCRv5_mobile_det
+识别：PP-OCRv5_mobile_rec
+本目录只放模型文件，供网页在同一站点下载后缓存。不在图片上叠字。

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { SpeakButton } from './SpeakButton.jsx'
 import { readJson, writeJson } from './storage.js'
+import { PhotoTranslate } from './PhotoTranslate.jsx'
 import { pronounceText, translateText, translationDirection } from './translate.js'
 
 const MAX = 4000
@@ -95,6 +96,7 @@ export function TranslatePanel({ rate }) {
         }}
       />
       <p className="meta">{direction ? direction.label : '输入中文或英文。翻译需要联网。'}</p>
+      <PhotoTranslate />
       <button type="button" className="go" disabled={loading || !source.trim()} onClick={submit}>
         {loading ? '正在翻译…' : '翻译'}
       </button>

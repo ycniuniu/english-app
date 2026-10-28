@@ -386,6 +386,89 @@ main {
   font-family: var(--display);
 }
 
+.photo-block {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: none;
+}
+
+.photo-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.photo-pick {
+  position: relative;
+  overflow: hidden;
+  flex: 1;
+  min-height: 48px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.photo-pick input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.photo-pick[aria-disabled='true'] {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.photo-note {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.photo-lines {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: min(42vh, 360px);
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.photo-line {
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: white;
+  box-shadow: var(--card-shadow);
+}
+
+.photo-line .source,
+.photo-line .zh {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.photo-line .zh {
+  margin-top: 4px;
+  font-family: var(--display);
+}
+
 .reader {
   padding: 4px 14px 10px;
   gap: 10px;
