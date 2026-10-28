@@ -9,7 +9,8 @@ import {
   ocrModelBytes,
   ocrRuntimeBytes,
 } from '../src/ocr-models.js'
-import { linesFromOcrItems, ocrFailureMessage, photoScript, photoTranslationDirection } from '../src/ocr-text.js'
+import { linesFromOcrItems, ocrFailureMessage, photoProgressStatus, photoScript, photoTranslationDirection } from '../src/ocr-text.js'
+import { capOrtWasmGlue, ORT_SAFARI_WASM_PAGES, ORT_WASM_MEMORY_MARKER } from '../src/ort-wasm-cap.js'
 import { translatePhotoLines } from '../src/photo-translate.js'
 import { buildMiniappOcrRequest, MINIAPP_OCR_PATH, mockMiniappOcr, parseMiniappOcrResponse } from '../src/miniapp-ocr.js'
 import { translateText, translationDirection } from '../src/translate.js'
@@ -69,11 +70,23 @@ test('a failed line keeps earlier rows and stops', async () => {
     },
   })
   assert.equal(result.ok, false)
-  assert.equal(result.rows.length, 1)
+  assert.equal(result.rows.length, 2)
+  assert.equal(result.rows[0].zh, '你好')
+  assert.equal(result.rows[1].source, 'Bye')
+  assert.equal(result.rows[1].zh, '')
   assert.match(result.error, /额度/)
   const empty = await translatePhotoLines(['  ', ''])
   assert.equal(empty.ok, false)
   assert.equal(empty.rows.length, 0)
+
+  const thrown = await translatePhotoLines(['HELLO'], {
+    translateImpl() {
+      throw new Error('socket')
+    },
+  })
+  assert.equal(thrown.ok, false)
+  assert.deepEqual(thrown.rows, [{ source: 'HELLO', zh: '', script: 'en' }])
+  assert.match(thrown.error, /连上/)
 })
 
 test('an explicit direction does not change the default language pair', async () => {
@@ -162,9 +175,60 @@ test('prefetch reads each model once and reports bytes', async () => {
 
 test('a failed download is not described as a successful photo', () => {
   assert.equal(ocrFailureMessage({ message: 'Failed to download model' }), '识别模型没有下载下来，请联网后再试。')
+  assert.equal(ocrFailureMessage({ message: 'Failed to download https://example/model.tar: HTTP 404' }), '识别模型没有下载下来，请联网后再试。')
   assert.equal(ocrFailureMessage({ message: 'PaddleOCR.js requires an HTTP(S) origin' }), '请用浏览器打开页面后再拍照。')
   assert.equal(ocrFailureMessage({ name: 'AbortError' }), '')
   assert.match(ocrFailureMessage(new Error('session')), /清晰/)
+  assert.match(ocrFailureMessage({ name: 'RangeError', message: 'Out of memory' }), /内存不够/)
+  assert.match(ocrFailureMessage(new Error('[wasm] RangeError: Out of memory')), /内存不够/)
+  assert.match(ocrFailureMessage(new Error('WebAssembly SIMD is not supported in the current environment.')), /指令/)
+  assert.match(ocrFailureMessage(new Error('cannot create shared memory without crossOriginIsolated')), /开不了识别组件/)
+  assert.match(ocrFailureMessage(new Error('Entry "inference.onnx" was not found in the tar archive.')), /不完整/)
+  assert.notEqual(ocrFailureMessage(new Error('Out of memory')), '')
+})
+
+test('progress labels keep download, loading, recognition, and translation apart', () => {
+  assert.equal(photoProgressStatus(null), '正在准备识别…')
+  assert.equal(photoProgressStatus({ phase: 'download', label: '4.6 MB / 20.5 MB' }), '正在下载识别模型… 4.6 MB / 20.5 MB')
+  assert.equal(photoProgressStatus({ phase: 'prepare' }), '正在加载识别组件…')
+  assert.equal(photoProgressStatus({ phase: 'recognize' }), '正在识别文字…')
+  assert.equal(photoProgressStatus({ phase: 'translate' }), '正在逐行翻译…')
+  assert.doesNotMatch(photoProgressStatus({ phase: 'prepare' }), /下载/)
+  assert.doesNotMatch(photoProgressStatus({ phase: 'recognize' }), /下载/)
+  assert.doesNotMatch(photoProgressStatus({ phase: 'translate' }), /下载/)
+})
+
+test('a stalled cache write does not block the model body', async () => {
+  const cachesImpl = {
+    async open() {
+      return {
+        async match() {
+          return undefined
+        },
+        put() {
+          return new Promise(() => {})
+        },
+      }
+    },
+  }
+  const fetchImpl = async () => new Response('weights', { status: 200 })
+  const response = await Promise.race([
+    fetchWithAssetCache('/ocr/model.tar', {}, { fetchImpl, cachesImpl }),
+    new Promise((_, reject) => setTimeout(() => reject(new Error('blocked')), 200)),
+  ])
+  assert.equal(await response.text(), 'weights')
+})
+
+test('the threaded wasm glue is capped below the iPhone shared-memory limit', () => {
+  const glue = readFileSync('node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.mjs', 'utf8')
+  assert.match(glue, /new WebAssembly\.Memory\(\{initial:256,maximum:65536,shared:!0\}\)/)
+  const capped = capOrtWasmGlue(glue)
+  assert.equal(capped.includes(ORT_WASM_MEMORY_MARKER), false)
+  assert.match(capped, new RegExp(`new WebAssembly\\.Memory\\(\\{initial:256,maximum:${ORT_SAFARI_WASM_PAGES},shared:!0\\}\\)`))
+  assert.match(capped, /maximum:0,shared:!0/)
+  assert.equal(capOrtWasmGlue(capped), capped)
+  assert.equal(ORT_SAFARI_WASM_PAGES * 65536, 201326592)
+  assert.throws(() => capOrtWasmGlue('untouched glue'), /4 GiB/)
 })
 
 test('first-load size uses the measured files', () => {
@@ -218,9 +282,22 @@ test('the photo entry stays on the translate page and does not touch stored keys
 
   const runtime = readFileSync('src/ocr-runtime.js', 'utf8')
   assert.match(runtime, /numThreads:\s*1/)
+  assert.match(runtime, /proxy:\s*false/)
+  assert.match(runtime, /wasm:\s*new URL\(ortWasmUrl/)
+  assert.match(runtime, /mjs:\s*new URL\(ortWasmGlueUrl/)
+  assert.match(runtime, /phase: 'prepare'/)
+  assert.match(runtime, /phase: 'recognize'/)
+  assert.doesNotMatch(runtime, /worker:\s*true/)
+  assert.doesNotMatch(runtime, /textDetectionModelName: OCR_MODELS\.detection\.name[\s\S]*worker:\s*true/)
   assert.match(runtime, /textDetectionModelName: OCR_MODELS\.detection\.name/)
   assert.match(runtime, /textRecognitionModelName: OCR_MODELS\.recognition\.name/)
   assert.doesNotMatch(runtime, /localStorage|kaikou\./)
+  assert.match(photo, /photoProgressStatus/)
+  assert.match(photo, /setStatus\(''\)/)
+  assert.match(photo, /ocrFailureMessage\(err\)/)
+  const vite = readFileSync('vite.config.js', 'utf8')
+  assert.match(vite, /capOrtWasmMemory/)
+  assert.match(vite, /capOrtWasmGlue/)
   const models = readFileSync('src/ocr-models.js', 'utf8')
   assert.match(models, /PP-OCRv5_mobile_det/)
   assert.match(models, /PP-OCRv5_mobile_rec/)

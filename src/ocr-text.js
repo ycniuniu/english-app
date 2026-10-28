@@ -90,12 +90,35 @@ export function photoTranslationDirection(text) {
   return { from: 'en', to: 'zh-CN', english: false, label: '英文 → 中文', script: 'en' }
 }
 
+export function photoProgressStatus(progress) {
+  const phase = progress?.phase
+  if (phase === 'download') {
+    const label = String(progress.label || '').trim()
+    return label ? `正在下载识别模型… ${label}` : '正在下载识别模型…'
+  }
+  if (phase === 'prepare') return '正在加载识别组件…'
+  if (phase === 'recognize') return '正在识别文字…'
+  if (phase === 'translate') return '正在逐行翻译…'
+  return '正在准备识别…'
+}
+
 export function ocrFailureMessage(error) {
   if (error?.name === 'AbortError') return ''
   const message = String(error?.message || '')
   if (/file:|HTTP\(S\) origin/i.test(message)) return '请用浏览器打开页面后再拍照。'
-  if (/download|Failed to fetch|NetworkError|network|Load failed/i.test(message)) {
+  if (/download|Failed to fetch|NetworkError|network|Load failed|HTTP \d+/i.test(message)) {
     return '识别模型没有下载下来，请联网后再试。'
   }
+  if (error?.name === 'RangeError' || /out of memory|allocate memory|Maximum memory/i.test(message)) {
+    return '这台手机内存不够，识别停了。请关掉别的页面后再试。'
+  }
+  if (/SIMD/i.test(message)) return '这台浏览器不支持识别所需的指令。'
+  if (/shared memory|crossOriginIsolated|SharedArrayBuffer/i.test(message)) {
+    return '这台浏览器开不了识别组件。请用系统自带的浏览器打开后再试。'
+  }
+  if (/inference\.(onnx|yml)|tar archive|model_name/i.test(message)) {
+    return '识别模型文件不完整，请刷新页面后再试。'
+  }
+  if (/timed out|timeout/i.test(message)) return '识别超时了，请换一张更小的照片。'
   return '这张照片没有识别成，请换一张更清晰的。'
 }
