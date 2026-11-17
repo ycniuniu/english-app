@@ -87,13 +87,19 @@ test('grammar points have a lesson, a contrast, and one exercise', () => {
       assert.ok(example.text.length > 0)
       assert.match(example.zh, HAN)
     }
-    assert.ok(point.contrast.wrong !== point.contrast.right)
-    assert.match(point.contrast.why, HAN)
-    const texts = point.exercise.options.map((option) => option.text)
-    assert.equal(new Set(texts).size, texts.length, point.id)
-    assert.ok(point.exercise.options.some((option) => option.id === point.exercise.answer))
-    assert.match(point.exercise.explanation, HAN)
+    const contrasts = point.contrasts || [point.contrast]
+    for (const item of contrasts) {
+      assert.ok(item.wrong !== item.right)
+      assert.match(item.why, HAN)
+    }
+    const drills = point.exercises || [point.exercise]
+    for (const drill of drills) {
+      const texts = drill.options.map((option) => option.text)
+      assert.equal(new Set(texts).size, texts.length, point.id)
+      assert.ok(drill.options.some((option) => option.id === drill.answer))
+      assert.match(drill.explanation, HAN)
+    }
   }
-  assert.equal(grammarPoints.filter((point) => point.lang === 'en').length, 12)
-  assert.equal(grammarPoints.filter((point) => point.lang === 'ja').length, 15)
+  assert.equal(grammarPoints.filter((point) => point.lang === 'en').length, 22)
+  assert.equal(grammarPoints.filter((point) => point.lang === 'ja').length, 25)
 })

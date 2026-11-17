@@ -20,6 +20,12 @@ function pointOk(row) {
   if (row.exercise != null && (typeof row.exercise !== 'object' || typeof row.exercise.choice !== 'string' || typeof row.exercise.correct !== 'boolean' || typeof row.exercise.at !== 'string')) {
     return false
   }
+  if (row.exercises != null) {
+    if (typeof row.exercises !== 'object' || Array.isArray(row.exercises)) return false
+    for (const item of Object.values(row.exercises)) {
+      if (!item || typeof item.choice !== 'string' || typeof item.correct !== 'boolean' || typeof item.at !== 'string') return false
+    }
+  }
   return true
 }
 
@@ -36,6 +42,7 @@ export function loadGrammar(value) {
       state.points[id] = {
         ...row,
         exercise: row.exercise ? { ...row.exercise } : null,
+      exercises: row.exercises ? { ...row.exercises } : row.exercises,
       }
     }
   }
@@ -96,6 +103,22 @@ export function setLearned(state, id, learned, today = todayKey()) {
 export function toggleGrammarFavorite(state, id) {
   const prev = rowOf(state, id)
   const points = { ...state.points, [id]: { ...prev, favorite: !prev.favorite } }
+  return { ...state, points }
+}
+
+export function recordDrill(state, id, index, choice, correct, at, today = todayKey()) {
+  const prev = rowOf(state, id)
+  const exercises = { ...(prev.exercises || {}), [String(index)]: { choice, correct, at } }
+  const points = {
+    ...state.points,
+    [id]: {
+      ...prev,
+      exercises,
+      exercise: { choice, correct, at },
+      lastResult: correct ? 'ok' : 'miss',
+      reviewOn: correct ? addDays(today, REVIEW_GAP_DAYS) : today,
+    },
+  }
   return { ...state, points }
 }
 

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { grammarPoints, questions } from './data/study-index.js'
-import { dueGrammarIds, persistGrammar, readGrammarStore, recordExercise, setLearned, toggleGrammarFavorite } from './grammar-progress.js'
+import { dueGrammarIds, persistGrammar, readGrammarStore, recordDrill, recordExercise, setLearned, toggleGrammarFavorite } from './grammar-progress.js'
 import { readQuizStore } from './quiz-progress.js'
 import { todayKey } from './srs.js'
 import { storageFailureMessage } from './storage.js'
@@ -18,6 +18,8 @@ export function GrammarPanel({ focusId, onOpenQuiz }) {
   const [pointId, setPointId] = useState('')
   const [choice, setChoice] = useState('')
   const [showAnswer, setShowAnswer] = useState(false)
+  const [drillPick, setDrillPick] = useState({})
+  const [drillShown, setDrillShown] = useState({})
   const quiz = useMemo(() => readQuizStore(), [pack])
 
   useEffect(() => {
@@ -29,6 +31,8 @@ export function GrammarPanel({ focusId, onOpenQuiz }) {
     setPointId(point.id)
     setChoice('')
     setShowAnswer(false)
+    setDrillPick({})
+    setDrillShown({})
     return undefined
   }, [focusId])
 
@@ -51,6 +55,8 @@ export function GrammarPanel({ focusId, onOpenQuiz }) {
     setPointId(id)
     setChoice('')
     setShowAnswer(false)
+    setDrillPick({})
+    setDrillShown({})
   }
 
   let body
@@ -66,22 +72,50 @@ export function GrammarPanel({ focusId, onOpenQuiz }) {
         <p className="kicker">{point.lang === 'ja' ? '日语' : '英语'} · {point.level}</p>
         <h2>{point.title}</h2>
         <p className="lead">{point.summary}</p>
-        <p className="meta">{point.levelNote}</p>
+        {point.rule ? <p>{point.rule}</p> : null}
+        <p className="meta">{point.scope || point.levelNote}</p>
         <div className="fact-block">
           <p className="fact-label">例句</p>
           {point.examples.map((example) => (
             <div key={example.text} className="example">
               <p lang={point.lang === 'ja' ? 'ja' : 'en'}>{example.text}</p>
+              {example.reading ? <p className="meta" lang="ja">{example.reading}</p> : null}
               <p className="example-zh">{example.zh}</p>
             </div>
           ))}
         </div>
-        <div className="contrast">
-          <p className="fact-label">易错对比</p>
-          <p className="bad-line" lang={point.lang === 'ja' ? 'ja' : 'en'}>{point.contrast.wrong}</p>
-          <p className="ok-line" lang={point.lang === 'ja' ? 'ja' : 'en'}>{point.contrast.right}</p>
-          <p>{point.contrast.why}</p>
-        </div>
+        {(point.contrasts || [point.contrast]).filter(Boolean).map((item) => (
+          <div key={item.wrong} className="contrast">
+            <p className="fact-label">易错对比</p>
+            <p className="bad-line" lang={point.lang === 'ja' ? 'ja' : 'en'}>{item.wrong}</p>
+            <p className="ok-line" lang={point.lang === 'ja' ? 'ja' : 'en'}>{item.right}</p>
+            <p>{item.why}</p>
+          </div>
+        ))}
+        {point.exercises ? point.exercises.map((drill, index) => {
+          const saved = row?.exercises?.[String(index)]
+          const picked = drillPick[index] || ''
+          const shown = Boolean(drillShown[index] || saved)
+          return (
+            <div key={drill.stem} className="fact-block">
+              <p className="fact-label">练习 {index + 1}</p>
+              <p className="question-stem" lang={point.lang === 'ja' ? 'ja' : 'en'}>{drill.stem}</p>
+              <div className="choice-stack" role="radiogroup" aria-label={`练习 ${index + 1}`}>
+                {drill.options.map((option) => (
+                  <button key={option.id} type="button" role="radio" aria-checked={(shown ? saved?.choice : picked) === option.id} className="choice" disabled={shown} onClick={() => setDrillPick((current) => ({ ...current, [index]: option.id }))}>
+                    {option.text}
+                  </button>
+                ))}
+              </div>
+              {shown ? <p className="meta">{drill.explanation}</p> : (
+                <button type="button" className="go" disabled={!picked} onClick={() => {
+                  remember(recordDrill(pack.state, point.id, index, picked, picked === drill.answer, new Date().toISOString(), today))
+                  setDrillShown((current) => ({ ...current, [index]: true }))
+                }}>提交</button>
+              )}
+            </div>
+          )
+        }) : (
         <div className="fact-block">
           <p className="fact-label">练一题</p>
           <p className="question-stem" lang={point.lang === 'ja' ? 'ja' : 'en'}>{point.exercise.stem}</p>
@@ -108,6 +142,7 @@ export function GrammarPanel({ focusId, onOpenQuiz }) {
             </button>
           ) : null}
         </div>
+        )}
         {linked.length ? (
           <div className="gap-note">
             <p>刷题里还错着、并标了这个知识点的题：</p>
