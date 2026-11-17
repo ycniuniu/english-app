@@ -1,13 +1,14 @@
 import { EXAM_CATALOG } from './exam-catalog.js'
 import { englishGrammar } from './grammar-en.js'
 import { japaneseGrammar } from './grammar-ja.js'
+import { starterGrammar } from './grammar-starter.js'
 import { ieltsPassages, ieltsQuestions } from './quiz-ielts.js'
 import { jlptPassages, jlptQuestions } from './quiz-jlpt.js'
 import { toeflPassages, toeflQuestions } from './quiz-toefl.js'
 
 export const passages = [...ieltsPassages, ...toeflPassages, ...jlptPassages]
 export const questions = [...ieltsQuestions, ...toeflQuestions, ...jlptQuestions]
-export const grammarPoints = [...englishGrammar, ...japaneseGrammar]
+export const grammarPoints = [...englishGrammar, ...japaneseGrammar, ...starterGrammar]
 
 const passageMap = new Map(passages.map((item) => [item.id, item]))
 const grammarMap = new Map(grammarPoints.map((item) => [item.id, item]))
