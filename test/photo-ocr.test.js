@@ -263,9 +263,11 @@ test('mini program placeholder returns bilingual lines and rejects an empty phot
 test('the photo entry stays on the translate page and does not touch stored keys', () => {
   const app = readFileSync('src/App.jsx', 'utf8')
   const nav = app.slice(app.indexOf('<nav'), app.indexOf('</nav>'))
-  assert.equal((nav.match(/<button/g) || []).length, 2)
+  assert.equal((nav.match(/<button/g) || []).length, 4)
   assert.match(nav, />\s*翻译\s*</)
   assert.match(nav, />\s*单词\s*</)
+  assert.match(nav, />\s*刷题\s*</)
+  assert.match(nav, />\s*语法学习\s*</)
   assert.doesNotMatch(nav, /拍照/)
 
   const panel = readFileSync('src/TranslatePanel.jsx', 'utf8')
