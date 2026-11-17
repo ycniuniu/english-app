@@ -10,6 +10,7 @@ import {
   previewJlptAnswerPdf,
   previewOfficialKeyText,
 } from './official-import.js'
+import { parseOfficialCsv } from './official-parse.js'
 import { sha256Hex } from './official-parse.js'
 import { renderPdfPage } from './pdf-items.js'
 
@@ -109,6 +110,37 @@ export function OfficialPanel() {
     })
     setFiles([{ role: 'answer-json', name: file.name, type: 'application/json', buffer }])
     setNotice('JSON 通过校验。还没有写入。')
+  }
+
+  async function onCsv(event) {
+    const file = event.target.files && event.target.files[0]
+    event.target.value = ''
+    if (!file) return
+    const text = await file.text()
+    const parsed = parseOfficialCsv(text)
+    if (!parsed.ok) {
+      setPreview(null)
+      setNotice(parsed.error)
+      return
+    }
+    const buffer = new TextEncoder().encode(text)
+    const hash = await sha256Hex(buffer)
+    setPreview({
+      ok: true,
+      hash,
+      mode: 'csv-key',
+      exam: parsed.exam,
+      level: '',
+      edition: 'csv',
+      title: file.name,
+      sourceUrl: '',
+      sections: parsed.sections,
+      items: parsed.items,
+      unpaired: [],
+      createdAt: new Date().toISOString(),
+    })
+    setFiles([{ role: 'answer-csv', name: file.name, type: 'text/csv', buffer }])
+    setNotice('CSV 通过校验。还没有写入。题目只放在这台浏览器里。')
   }
 
   async function addExtra(event, role) {
@@ -250,9 +282,16 @@ export function OfficialPanel() {
             或导入校验过的 JSON 题库
             <input type="file" accept="application/json,.json" onChange={onKeyJson} />
           </label>
+          <label className="file-pick">
+            或导入 CSV 题库
+            <input aria-label="导入 CSV 题库" type="file" accept="text/csv,.csv" onChange={onCsv} />
+          </label>
+          <p className="meta">
+            CSV 表头用 exam,id,section,skill,stem,choice1,choice2,choice3,choice4,answer,explanation,reference。示例题只在仓库说明 docs/official-import-template.md，不是官方题。
+          </p>
           {preview ? (
             <div className="backup-preview">
-              <p>将写入 {preview.items.length} 题。模式：{preview.mode === 'pdf-answer-sheet' ? '对照原卷作答，不是自动抽题。' : 'JSON 答题卡。'}</p>
+              <p>将写入 {preview.items.length} 题。模式：{preview.mode === 'pdf-answer-sheet' ? '对照原卷作答，不是自动抽题。' : preview.mode === 'csv-key' ? 'CSV 题库。' : 'JSON 答题卡。'}</p>
               <ul className="plain-list">
                 {preview.sections.map((section) => (
                   <li key={section.id}>{section.label} {section.count} 题</li>
@@ -275,7 +314,7 @@ export function OfficialPanel() {
           {packs.length ? packs.map((pack) => (
             <article key={pack.id} className="exam-card">
               <strong>{pack.title}</strong>
-              <span>{pack.itemCount} 题 · {pack.mode === 'pdf-answer-sheet' ? '原卷答题卡' : 'JSON'}</span>
+              <span>{pack.itemCount} 题 · {pack.mode === 'pdf-answer-sheet' ? '原卷答题卡' : pack.mode === 'csv-key' ? 'CSV' : 'JSON'}</span>
               <small>{pack.level} {pack.edition}</small>
               <button type="button" className="go" onClick={() => setActiveId(pack.id)}>继续练</button>
               {pendingDelete === pack.id ? (
@@ -426,6 +465,7 @@ function PackPractice({ db, pack, onBack, onNotice }) {
         </div>
       ) : <p className="gap-note">还没有原卷 PDF。你仍可以按题号作答，打开自己保存的卷子对照。这不是自动抽题。</p>}
       <h3>题号 {String(item.no)}</h3>
+      {item.stem ? <p className="question-stem">{item.stem}</p> : null}
       {item.skill === 'listening' ? <p className="meta">听力要看原卷或听你自己导入的音频。没有音频文件时，这里不播放。</p> : null}
       {audios.map((row) => <audio key={row.id} controls src={row.url} />)}
       {constructed ? (

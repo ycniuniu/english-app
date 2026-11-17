@@ -169,6 +169,7 @@ export function parseOfficialKey(value) {
     if (!constructed && answer && !choices.includes(answer)) return { ok: false, error: `题目 ${raw.id} 的答案不在选项里。整份没有写入。` }
     items.push({
       id: raw.id,
+      stem: typeof raw.stem === 'string' ? raw.stem : '',
       section: typeof raw.section === 'string' ? raw.section : skill,
       sectionLabel: typeof raw.sectionLabel === 'string' ? raw.sectionLabel : (typeof raw.section === 'string' ? raw.section : skill),
       no: raw.no == null ? raw.id : raw.no,
@@ -191,6 +192,88 @@ export function parseOfficialKey(value) {
     sections: summarizeSections(items),
     unpaired: [],
   }
+}
+
+function parseCsvRows(text) {
+  const rows = []
+  let row = []
+  let cell = ''
+  let quoted = false
+  const source = String(text || '').replace(/^\uFEFF/, '')
+  for (let index = 0; index < source.length; index += 1) {
+    const char = source[index]
+    if (quoted) {
+      if (char === '"') {
+        if (source[index + 1] === '"') {
+          cell += '"'
+          index += 1
+        } else quoted = false
+      } else cell += char
+      continue
+    }
+    if (char === '"') {
+      quoted = true
+      continue
+    }
+    if (char === ',') {
+      row.push(cell)
+      cell = ''
+      continue
+    }
+    if (char === '\n') {
+      row.push(cell)
+      rows.push(row)
+      row = []
+      cell = ''
+      continue
+    }
+    if (char !== '\r') cell += char
+  }
+  if (cell.length || row.length) {
+    row.push(cell)
+    rows.push(row)
+  }
+  return rows.filter((line) => line.some((item) => item.trim()))
+}
+
+export function parseOfficialCsv(text) {
+  const rows = parseCsvRows(text)
+  if (rows.length < 2) return { ok: false, error: 'CSV 至少要有表头和一行题目。没有写入。' }
+  const header = rows[0].map((item) => item.trim())
+  const column = (name) => header.indexOf(name)
+  if (column('exam') < 0 || column('id') < 0) return { ok: false, error: 'CSV 表头必须有 exam 和 id。没有写入。' }
+  const items = []
+  let exam = ''
+  for (const line of rows.slice(1)) {
+    const read = (name) => {
+      const index = column(name)
+      return index < 0 ? '' : String(line[index] || '').trim()
+    }
+    const rowExam = read('exam')
+    if (!exam) exam = rowExam
+    if (rowExam && rowExam !== exam) return { ok: false, error: '一份 CSV 只能包含一种考试。没有写入。' }
+    const choices = ['choice1', 'choice2', 'choice3', 'choice4'].map(read).filter(Boolean)
+    const page = Number(read('page'))
+    items.push({
+      id: read('id'),
+      stem: read('stem'),
+      section: read('section') || read('skill') || 'reading',
+      sectionLabel: read('section') || read('skill') || 'reading',
+      skill: read('skill') || 'reading',
+      choices,
+      answer: read('answer'),
+      explanation: read('explanation'),
+      reference: read('reference'),
+      page: Number.isInteger(page) && page > 0 ? page : undefined,
+    })
+  }
+  return parseOfficialKey({
+    format: 'kaikou-official-key',
+    version: 1,
+    exam,
+    source: { title: 'CSV 导入', level: '', edition: 'csv' },
+    items,
+  })
 }
 
 export function summarizeSections(items) {

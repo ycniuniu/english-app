@@ -3,7 +3,7 @@ import test from 'node:test'
 import { WORD_KEY } from '../src/storage-keys.js'
 import { createMemoryOfficialDb } from '../src/official-db.js'
 import { answerOfficial, commitOfficialPack, parseOfficialBackup, previewOfficialKeyText } from '../src/official-import.js'
-import { pairJlptAnswerSheet, sha256Hex } from '../src/official-parse.js'
+import { pairJlptAnswerSheet, parseOfficialCsv, sha256Hex } from '../src/official-parse.js'
 
 test('JLPT answer rows pair by x and drop the listening example', () => {
   const paired = pairJlptAnswerSheet([
@@ -102,6 +102,28 @@ test('the same official file imports once and a failed write keeps the old pack'
   assert.equal(store[WORD_KEY].includes('2026-12-01'), true)
   const graded = answerOfficial({ packId: 'x', answers: {}, wrong: {}, history: [] }, parsed.items[1], 'my essay', 't2')
   assert.equal(graded.answers.w1.correct, null)
+})
+
+test('a homemade CSV becomes practice items and does not touch word storage', () => {
+  const store = { [WORD_KEY]: '{"cards":{"3":{"due":"2026-12-01"}}}' }
+  globalThis.localStorage = {
+    getItem: (key) => store[key] ?? null,
+    setItem() {
+      throw new Error('word storage should not be written')
+    },
+  }
+  const parsed = parseOfficialCsv([
+    'exam,id,section,skill,stem,choice1,choice2,choice3,choice4,answer,explanation,reference',
+    'ielts,example-1,reading,reading,自制题：Which word means 书？,book,water,train,,book,,',
+    'ielts,example-2,writing,writing,自制题：写一句话。,,,,,',
+  ].join('\n'))
+  assert.equal(parsed.ok, true)
+  assert.equal(parsed.items[0].answer, 'book')
+  assert.equal(parsed.items[0].stem.includes('自制题'), true)
+  assert.equal(parsed.items[1].constructed, true)
+  const bad = parseOfficialCsv('exam,id\nielts,example-1\ntoefl,example-2\n')
+  assert.equal(bad.ok, false)
+  assert.equal(store[WORD_KEY].includes('2026-12-01'), true)
 })
 
 test('official backup is a different format from the word backup', () => {

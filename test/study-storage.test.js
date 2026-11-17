@@ -213,6 +213,37 @@ test('blocked storage does not throw and export refuses cleanly', () => {
   assert.equal(Object.prototype.hasOwnProperty.call(store.data, SNAPSHOT_KEY), false)
 })
 
+test('preset legacy records stay byte for byte when the new modules load', async () => {
+  const { readFileSync } = await import('node:fs')
+  const legacy = {
+    'kaikou.words.v1': WORDS,
+    'kaikou.ja.v1': JA,
+    'kaikou.translate.v1': JSON.stringify({ source: '駅', result: '车站', label: '日语', english: false }),
+    'kaikou.rate.v1': 'slow',
+    'kaikou.tab.v1': 'words',
+    'kaikou.study-lang.v1': 'en',
+    'kaikou.home-tip.v1': 'dismissed',
+    'kaikou.read.v1': '旧跟读稿',
+  }
+  const store = memory(legacy)
+  install(store)
+  readQuizStore()
+  readGrammarStore()
+  const { parseOfficialCsv } = await import('../src/official-parse.js')
+  const csv = parseOfficialCsv('exam,id,skill,stem,choice1,choice2,answer\nielts,example-1,reading,自制题,book,water,book\n')
+  assert.equal(csv.ok, true)
+  assert.equal(csv.items[0].stem, '自制题')
+  for (const [key, value] of Object.entries(legacy)) assert.equal(store.data[key], value, key)
+  const wordsPanel = readFileSync('src/WordsPanel.jsx', 'utf8')
+  const jaPanel = readFileSync('src/JaPanel.jsx', 'utf8')
+  const translate = readFileSync('src/TranslatePanel.jsx', 'utf8')
+  assert.match(wordsPanel, /writeJson\(STORAGE_KEY, \{ cards \}\)/)
+  assert.match(jaPanel, /writeJson\(JA_STORAGE_KEY, \{ cards \}\)/)
+  assert.match(translate, /const STORAGE_KEY = 'kaikou\.translate\.v1'/)
+  assert.match(readFileSync('src/srs.js', 'utf8'), /export const STORAGE_KEY = 'kaikou\.words\.v1'/)
+  assert.match(readFileSync('src/ja-progress.js', 'utf8'), /export const JA_STORAGE_KEY = 'kaikou\.ja\.v1'/)
+})
+
 test('source does not clear localStorage', async () => {
   const { readFileSync } = await import('node:fs')
   const files = [
