@@ -75,6 +75,7 @@ button:active:not(:disabled) {
 }
 
 .app {
+  position: relative;
   height: calc(100dvh - var(--keyboard));
   max-height: calc(100dvh - var(--keyboard));
   display: flex;
@@ -1177,4 +1178,298 @@ main {
   *, *::before, *::after {
     animation: none !important;
   }
+}
+
+.backup-open {
+  flex: none;
+  min-height: 40px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--pine);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.title-tools .badge {
+  max-width: 22vw;
+}
+
+.nav button {
+  font-size: 12px;
+  line-height: 1.15;
+  padding: 4px 1px 2px;
+}
+
+.study-panel {
+  min-height: 0;
+}
+
+.study-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 4px 16px 20px;
+}
+
+.study-fallback {
+  padding: 16px;
+}
+
+.study-body h2,
+.backup-body h2,
+.question-stem {
+  margin: 4px 0 8px;
+  font-family: var(--display);
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.question-stem {
+  font-family: var(--sans);
+  font-size: 18px;
+}
+
+.prompt {
+  margin: 8px 0;
+  color: var(--ink-soft);
+}
+
+.text-back,
+.text-link {
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--pine);
+  font-weight: 700;
+  text-align: left;
+}
+
+.exam-list,
+.choice-stack,
+.stack-gap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.exam-card,
+.choice-stack button,
+.choice {
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--paper-2);
+  text-align: left;
+  line-height: 1.4;
+}
+
+.exam-card {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.exam-card span,
+.exam-card small,
+.choice-stack small {
+  color: var(--ink-soft);
+  font-size: 13px;
+}
+
+.choice {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.choice[aria-checked="true"] {
+  border-color: var(--pine);
+}
+
+.choice.ok {
+  border-color: var(--pine);
+  background: #e7f3ec;
+}
+
+.choice.bad {
+  border-color: var(--cinnabar);
+  background: #f8e6dc;
+}
+
+.choice small,
+.choice-stack button small {
+  display: block;
+}
+
+.passage,
+.contrast,
+.stat-block,
+.backup-preview {
+  margin: 10px 0;
+  padding: 12px;
+  border-radius: 16px;
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+}
+
+.passage p,
+.contrast p,
+.stat-block p {
+  margin: 0 0 8px;
+}
+
+.gap-note {
+  margin: 10px 0;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: #f8e6dc;
+  color: #6e2a1c;
+}
+
+.bad-line,
+.ok-line {
+  margin: 0 0 6px;
+  padding: 8px 10px;
+  border-radius: 12px;
+}
+
+.bad-line {
+  background: #f8e6dc;
+}
+
+.ok-line {
+  background: #e7f3ec;
+}
+
+.plain-list,
+.link-list {
+  margin: 8px 0 12px;
+  padding-left: 18px;
+}
+
+.plain-list li,
+.link-list li {
+  margin: 6px 0;
+}
+
+.backup-sheet {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  background: var(--paper);
+}
+
+.backup-bar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(12px + var(--safe-top)) 16px 8px;
+}
+
+.backup-bar h2 {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 28px;
+}
+
+.backup-bar button {
+  min-height: 44px;
+  border: 0;
+  background: transparent;
+  color: var(--pine);
+  font-weight: 700;
+}
+
+.backup-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0 16px calc(16px + var(--safe-bottom));
+}
+
+.file-pick {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 12px 0;
+  font-weight: 700;
+}
+
+.file-pick input,
+.check-line {
+  font-size: 16px;
+}
+
+.check-line {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin: 8px 0 12px;
+}
+
+.choice-stack button[aria-checked="true"],
+.choice-stack button[aria-pressed="true"] {
+  border-color: transparent;
+  background: var(--pine-gradient);
+  color: #fbf7f0;
+}
+
+.choice-stack button[aria-checked="true"] small,
+.choice-stack button[aria-pressed="true"] small,
+.choice-stack button[aria-checked="true"] span,
+.choice-stack button[aria-pressed="true"] span {
+  color: #fbf7f0;
+}
+
+.study-body .tracks {
+  flex-wrap: wrap;
+}
+
+.study-body .tracks button {
+  flex: 1 1 30%;
+}
+
+.official-block h2,
+.official-block h3 {
+  margin: 12px 0 8px;
+  font-family: var(--display);
+}
+
+.pdf-frame {
+  overflow: auto;
+  max-height: 46vh;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: white;
+}
+
+.pdf-frame canvas {
+  width: 100%;
+  height: auto;
+}
+
+.official-draft {
+  width: 100%;
+  min-height: 96px;
+  font-size: 16px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: var(--paper-2);
+}
+
+.official-block audio {
+  width: 100%;
+  margin: 8px 0;
 }

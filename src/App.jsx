@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
-import { TranslateIcon, WordsIcon } from './icons.jsx'
+import { lazy, Suspense, useEffect, useState } from 'react'
+import { DataBackup } from './DataBackup.jsx'
+import { GrammarIcon, QuizIcon, TranslateIcon, WordsIcon } from './icons.jsx'
 import { IosInstallTip } from './IosInstallTip.jsx'
 import { JaPanel } from './JaPanel.jsx'
 import { japanesePhrase } from './voice.js'
@@ -9,6 +10,9 @@ import { TranslatePanel } from './TranslatePanel.jsx'
 import { frameForViewport, pinDocumentScroll } from './viewport.js'
 import { voicePhrase } from './voice.js'
 import { WordsPanel } from './WordsPanel.jsx'
+
+const QuizPanel = lazy(() => import('./QuizPanel.jsx').then((mod) => ({ default: mod.QuizPanel })))
+const GrammarPanel = lazy(() => import('./GrammarPanel.jsx').then((mod) => ({ default: mod.GrammarPanel })))
 
 const RATES = [
   { id: 'slow', label: '慢速', value: 0.85 },
@@ -24,6 +28,7 @@ function loadRate() {
 function loadTab() {
   const saved = readString('kaikou.tab.v1', 'translate')
   if (saved === 'words' || saved === 'ja') return 'words'
+  if (saved === 'quiz' || saved === 'grammar') return saved
   return 'translate'
 }
 
@@ -39,6 +44,11 @@ export function App() {
   const [studyOn, setStudyOn] = useState(() => loadTab() === 'words')
   const [enOn, setEnOn] = useState(() => loadTab() === 'words' && loadLang() === 'en')
   const [jaOn, setJaOn] = useState(() => loadTab() === 'words' && loadLang() === 'ja')
+  const [quizOn, setQuizOn] = useState(() => loadTab() === 'quiz')
+  const [grammarOn, setGrammarOn] = useState(() => loadTab() === 'grammar')
+  const [backupOpen, setBackupOpen] = useState(false)
+  const [grammarFocus, setGrammarFocus] = useState('')
+  const [quizFocus, setQuizFocus] = useState('')
   const [rateId, setRateId] = useState(loadRate)
   const speech = useSpeech()
   const rateItem = RATES.find((item) => item.id === rateId) ?? RATES[1]
@@ -62,7 +72,21 @@ export function App() {
       if (lang === 'ja') setJaOn(true)
       else setEnOn(true)
     }
+    if (next === 'quiz') setQuizOn(true)
+    if (next === 'grammar') setGrammarOn(true)
     setTab(next)
+  }
+
+  function openGrammar(id) {
+    setGrammarFocus(id)
+    setGrammarOn(true)
+    setTab('grammar')
+  }
+
+  function openQuiz(id) {
+    setQuizFocus(id)
+    setQuizOn(true)
+    setTab('quiz')
   }
 
   function selectLang(next) {
@@ -151,6 +175,9 @@ export function App() {
             <button type="button" className="rate-cycle" onClick={cycleRate} aria-label={`语速${rateItem.label}，点击切换`}>
               {rateItem.label}
             </button>
+            <button type="button" className="backup-open" onClick={() => setBackupOpen(true)}>
+              备份
+            </button>
             <span className="badge">{voiceLabel}</span>
           </div>
         </div>
@@ -193,7 +220,22 @@ export function App() {
             </div>
           </div>
         ) : null}
+        {quizOn ? (
+          <div className={tab === 'quiz' ? 'panel-wrap' : 'panel-wrap hidden'}>
+            <Suspense fallback={<p className="meta study-fallback">正在打开刷题…</p>}>
+              <QuizPanel focusId={quizFocus} onFocusHandled={() => setQuizFocus('')} onOpenGrammar={openGrammar} />
+            </Suspense>
+          </div>
+        ) : null}
+        {grammarOn ? (
+          <div className={tab === 'grammar' ? 'panel-wrap' : 'panel-wrap hidden'}>
+            <Suspense fallback={<p className="meta study-fallback">正在打开语法…</p>}>
+              <GrammarPanel focusId={grammarFocus} onOpenQuiz={openQuiz} />
+            </Suspense>
+          </div>
+        ) : null}
       </main>
+      {backupOpen ? <DataBackup onClose={() => setBackupOpen(false)} /> : null}
 
       <nav className="nav">
         <button type="button" aria-current={tab === 'translate' ? 'page' : undefined} onClick={() => selectTab('translate')}>
@@ -203,6 +245,14 @@ export function App() {
         <button type="button" aria-current={tab === 'words' ? 'page' : undefined} onClick={() => selectTab('words')}>
           <WordsIcon />
           单词
+        </button>
+        <button type="button" aria-current={tab === 'quiz' ? 'page' : undefined} onClick={() => selectTab('quiz')}>
+          <QuizIcon />
+          刷题
+        </button>
+        <button type="button" aria-current={tab === 'grammar' ? 'page' : undefined} onClick={() => selectTab('grammar')}>
+          <GrammarIcon />
+          语法学习
         </button>
       </nav>
       <p className="sr" aria-live="polite">
