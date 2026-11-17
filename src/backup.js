@@ -45,7 +45,7 @@ export function buildBackup(getItem, exportedAt) {
       format: BACKUP_FORMAT,
       version: BACKUP_VERSION,
       exportedAt,
-      note: '开口学习数据备份。包含原来的单词记录，以及刷题和语法记录。这不是官方成绩单。',
+      note: '开口学习数据备份。只含 localStorage 里的单词、翻译、内置刷题和语法。不含 IndexedDB 里的个人官方资料、原卷和音频。这不是官方成绩单。',
       keys: collected.keys,
     },
   }

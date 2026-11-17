@@ -31,11 +31,11 @@ async function shot(page, name) {
 
 const context = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, locale: 'zh-CN' })
 await context.addInitScript(({ words: wordText, ja: jaText }) => {
-  localStorage.setItem('kaikou.words.v1', wordText)
-  localStorage.setItem('kaikou.ja.v1', jaText)
-  localStorage.setItem('kaikou.tab.v1', 'translate')
-  localStorage.setItem('kaikou.rate.v1', 'slow')
-  localStorage.setItem('kaikou.study-lang.v1', 'ja')
+  if (!localStorage.getItem('kaikou.words.v1')) localStorage.setItem('kaikou.words.v1', wordText)
+  if (!localStorage.getItem('kaikou.ja.v1')) localStorage.setItem('kaikou.ja.v1', jaText)
+  if (!localStorage.getItem('kaikou.tab.v1')) localStorage.setItem('kaikou.tab.v1', 'translate')
+  if (!localStorage.getItem('kaikou.rate.v1')) localStorage.setItem('kaikou.rate.v1', 'slow')
+  if (!localStorage.getItem('kaikou.study-lang.v1')) localStorage.setItem('kaikou.study-lang.v1', 'ja')
 }, { words, ja })
 const page = await context.newPage()
 await page.goto(base)
@@ -166,6 +166,46 @@ await corruptPage.getByText('刷题记录损坏').waitFor()
 await shot(corruptPage, 'quiz-corrupt-iphone')
 const corruptRaw = await corruptPage.evaluate(() => ({ words: localStorage.getItem('kaikou.words.v1'), quiz: localStorage.getItem('kaikou.quiz.v1') }))
 if (corruptRaw.words !== words || corruptRaw.quiz !== '{not-json') throw new Error('corrupt quiz was overwritten')
+
+const wordsAfterOfficial = await page.evaluate(() => localStorage.getItem('kaikou.words.v1'))
+await page.getByRole('button', { name: '刷题' }).click()
+await page.getByRole('tab', { name: '个人官方资料' }).click()
+await page.getByRole('heading', { name: '个人官方资料' }).waitFor()
+await shot(page, 'official-sources-iphone')
+const fixture = {
+  format: 'kaikou-official-key',
+  version: 1,
+  exam: 'jlpt',
+  source: { title: '自制短卷', level: 'N5', edition: 'fixture' },
+  items: [
+    { id: 'q1', no: 1, section: 'vocabulary', sectionLabel: '文字', skill: 'language', choices: ['1', '2', '3', '4'], answer: '2', explanation: '' },
+    { id: 'w1', no: 1, section: 'writing', sectionLabel: '写作', skill: 'writing', choices: [], reference: '' },
+  ],
+}
+await page.locator('input[accept="application/json,.json"]').first().setInputFiles({
+  name: 'fixture.json',
+  mimeType: 'application/json',
+  buffer: Buffer.from(JSON.stringify(fixture)),
+})
+await page.getByRole('button', { name: '确认写入这台浏览器' }).click()
+await page.getByText('对照原卷，不是从 PDF 抽出的题干').waitFor()
+await page.getByRole('radio', { name: '1', exact: true }).click()
+await page.getByRole('button', { name: '提交这题' }).click()
+await page.getByText('官方答案表没有写解析').waitFor()
+await shot(page, 'official-practice-iphone')
+await page.reload()
+await page.getByRole('button', { name: '刷题' }).click()
+await page.getByRole('tab', { name: '个人官方资料' }).click()
+await page.getByText('当前已导入 2 题').waitFor()
+const still = await page.evaluate(() => localStorage.getItem('kaikou.words.v1'))
+if (still !== wordsAfterOfficial) throw new Error('official import changed word storage')
+await page.locator('input[accept="application/json,.json"]').first().setInputFiles({
+  name: 'bad.json',
+  mimeType: 'application/json',
+  buffer: Buffer.from('{'),
+})
+await page.getByText('没有写入').waitFor()
+if ((await page.evaluate(() => localStorage.getItem('kaikou.words.v1'))) !== wordsAfterOfficial) throw new Error('bad file changed words')
 
 console.log('e2e ok')
 await browser.close()

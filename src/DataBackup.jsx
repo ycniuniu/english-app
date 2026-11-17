@@ -100,7 +100,7 @@ export function DataBackup({ onClose }) {
       </div>
       <div className="backup-body">
         <p className="lead">
-          导出的是这台设备、这个网址里的原文。英语单词、日语单词、翻译草稿、语速、上次打开的页，以及刷题和语法，都在里面。不会清空记录。
+          这里导出的是 localStorage。英语单词、日语单词、翻译草稿、语速、上次打开的页，以及内置刷题和语法，都在里面。不会清空记录。个人官方资料在另一个本地数据库里，这份备份不含原卷、音频和那份进度。
         </p>
         <p className="meta">
           预览网址和 english-app-woad-ten.vercel.app 不是同一个网站，打不开彼此的本地记录。请在平时背单词的那个入口里导出：Safari 里打开的，就在 Safari 导出；主屏幕图标里用的，就在那个图标里导出。不要删除图标，也不要清除网站数据。

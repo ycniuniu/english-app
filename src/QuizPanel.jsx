@@ -14,7 +14,9 @@ import {
   withResume,
   wrongIds,
 } from './quiz-progress.js'
+import { OfficialPanel } from './OfficialPanel.jsx'
 import { storageFailureMessage } from './storage.js'
+import { contentCounts } from './data/study-index.js'
 
 function saveText(filename, text, type) {
   const blob = new Blob([text], { type })
@@ -56,6 +58,7 @@ export function QuizPanel({ focusId, onFocusHandled, onOpenGrammar }) {
   const [queue, setQueue] = useState(null)
   const [choice, setChoice] = useState('')
   const [revealed, setRevealed] = useState(false)
+  const [library, setLibrary] = useState('original')
   const exam = EXAM_CATALOG.find((item) => item.id === examId) || EXAM_CATALOG[0]
   const state = pack.state
   const current = queue ? questionById(queue.ids[queue.index]) : null
@@ -332,6 +335,18 @@ export function QuizPanel({ focusId, onFocusHandled, onOpenGrammar }) {
     body = (
       <div className="study-body">
         <p className="kicker">刷题</p>
+        <div className="tracks" role="tablist" aria-label="题库">
+          <button type="button" role="tab" aria-selected={library === 'original'} onClick={() => setLibrary('original')}>
+            内置原创 {contentCounts().questions}
+          </button>
+          <button type="button" role="tab" aria-selected={library === 'official'} onClick={() => setLibrary('official')}>
+            个人官方资料
+          </button>
+        </div>
+        {library === 'official' ? (
+          <OfficialPanel />
+        ) : (
+          <>
         <h2>选一个考试</h2>
         <p className="lead">
           日语先按日本语能力测试 JLPT 的 N5 到 N1 来做。这是对「国内参加的日语等级考试」的理解，不是专业四级、专业八级。雅思和托福只做标明的文字题，听说写没有自动评分的部分不会假装有。
@@ -370,6 +385,8 @@ export function QuizPanel({ focusId, onFocusHandled, onOpenGrammar }) {
             统计
           </button>
         </div>
+          </>
+        )}
       </div>
     )
   }

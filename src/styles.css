@@ -1439,3 +1439,37 @@ main {
 .study-body .tracks button {
   flex: 1 1 30%;
 }
+
+.official-block h2,
+.official-block h3 {
+  margin: 12px 0 8px;
+  font-family: var(--display);
+}
+
+.pdf-frame {
+  overflow: auto;
+  max-height: 46vh;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: white;
+}
+
+.pdf-frame canvas {
+  width: 100%;
+  height: auto;
+}
+
+.official-draft {
+  width: 100%;
+  min-height: 96px;
+  font-size: 16px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: var(--paper-2);
+}
+
+.official-block audio {
+  width: 100%;
+  margin: 8px 0;
+}

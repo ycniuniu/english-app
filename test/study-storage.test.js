@@ -224,10 +224,17 @@ test('source does not clear localStorage', async () => {
     'src/QuizPanel.jsx',
     'src/GrammarPanel.jsx',
     'src/DataBackup.jsx',
+    'src/OfficialPanel.jsx',
+    'src/official-db.js',
+    'src/official-import.js',
   ]
   for (const file of files) {
     const text = readFileSync(file, 'utf8')
     assert.equal(text.includes('localStorage.clear'), false, file)
-    assert.equal(text.includes('indexedDB'), false, file)
+    if (file !== 'src/official-db.js') assert.equal(text.includes('indexedDB'), false, file)
+    if (file.startsWith('src/official')) {
+      assert.equal(text.includes('kaikou.words.v1'), false, file)
+      assert.equal(text.includes('kaikou.ja.v1'), false, file)
+    }
   }
 })
