@@ -18,9 +18,231 @@ const BROAD_POS = {
   其他: '其他',
 }
 
-const VERB_SLOTS = ['原形', '过去式', '过去分词', '现在分词']
+const VERB_LABELS = ['base', 'past', 'past participle', '-ing']
+const VERB_SLOTS = ['base', 'past', 'pp', 'ing']
 const ADJECTIVE_SLOTS = ['原形', '比较级', '最高级']
 const NOUN_SLOTS = ['原形', '复数']
+
+const STATIVE_VERBS = new Set([
+  'believe',
+  'belong',
+  'consist',
+  'contain',
+  'cost',
+  'deserve',
+  'exist',
+  'have',
+  'hear',
+  'include',
+  'involve',
+  'know',
+  'lack',
+  'like',
+  'love',
+  'matter',
+  'mean',
+  'mind',
+  'need',
+  'owe',
+  'own',
+  'possess',
+  'prefer',
+  'remember',
+  'require',
+  'resemble',
+  'see',
+  'seem',
+  'suppose',
+  'understand',
+  'want',
+  'wish',
+])
+
+const INTRANS_BASES = new Set([
+  'appear',
+  'arise',
+  'arrive',
+  'come',
+  'die',
+  'fall',
+  'go',
+  'happen',
+  'lie',
+  'live',
+  'matter',
+  'occur',
+  'rise',
+  'run',
+  'sit',
+  'ski',
+  'sleep',
+  'stand',
+  'stay',
+  'swim',
+  'wait',
+  'walk',
+  'work',
+])
+
+const INTRANS_GLOSS = /^(来|来到|过来|去|走|工作|运转|发生|恰巧|死亡|死|消逝|坐|站|站立|跑|奔|游|躺|升起|上升|下降|倒下|居住|住|出现|睡觉|睡|等待|等|到达|抵达|开始|启动|离开|转弯|下雨|下雪|滑雪)/
+
+function shortGloss(text) {
+  const head = String(text || '')
+    .split(/[（(，,；;]/)[0]
+    .trim()
+  return head || '做'
+}
+
+function verbSense(senses) {
+  return (senses || []).find((sense) => String(sense.pos || '').includes('动词')) || null
+}
+
+function capWord(text) {
+  const value = String(text || '')
+  return value ? value.charAt(0).toUpperCase() + value.slice(1) : value
+}
+
+function examplePattern(base, gloss, senses) {
+  const key = String(base || '').toLowerCase()
+  const pos = String(verbSense(senses)?.pos || '')
+  const intransPos = pos.includes('不及物')
+  const transPos = pos.includes('及物') && !intransPos
+  if (key === 'belong' || gloss.startsWith('属于')) return 'belong'
+  if (key === 'consist' || /^(组成|存在于|一致)/.test(gloss)) return 'consist'
+  if (key === 'cost' || gloss.startsWith('花费')) return 'cost'
+  if (key === 'exist' || /^(存在|生存)/.test(gloss)) return 'exist'
+  if (key === 'seem' || key === 'become' || key === 'remain') return 'link'
+  if (/^(象是|似乎|好像|好象|显得|变成|变得)/.test(gloss)) return 'link'
+  if (intransPos && /^(保持|逗留|仍然)/.test(gloss)) return 'link'
+  const intrans = intransPos || INTRANS_BASES.has(key) || INTRANS_GLOSS.test(gloss)
+  const stative = STATIVE_VERBS.has(key)
+  if (intrans && (!transPos || INTRANS_BASES.has(key))) return stative ? 'stative-intrans' : 'intrans'
+  return stative ? 'stative-obj' : 'obj'
+}
+
+function linkChinese(gloss, slot) {
+  const meaning = /变成|变得/.test(gloss) ? '变得清楚' : /保持|逗留|仍然/.test(gloss) ? '保持清楚' : '看起来清楚'
+  if (slot === 'past') return `事情昨天${meaning}。`
+  if (slot === 'pp') return `事情以前${meaning}过。`
+  if (slot === 'ing') return `${meaning}需要练习。`
+  return `事情${meaning}。`
+}
+
+function exampleLine(pattern, form, slot, gloss) {
+  const zh = gloss || '做'
+  const cap = capWord(form)
+  if (pattern === 'link') {
+    if (slot === 'past') return [`Things ${form} clear yesterday.`, linkChinese(zh, slot)]
+    if (slot === 'pp') return [`Things have ${form} clear before.`, linkChinese(zh, slot)]
+    if (slot === 'ing') return [`${cap} clear takes practice.`, linkChinese(zh, slot)]
+    return [`Things ${form} clear.`, linkChinese(zh, slot)]
+  }
+  if (pattern === 'belong') {
+    if (slot === 'past') return [`They ${form} here yesterday.`, '他们昨天属于这里。']
+    if (slot === 'pp') return [`They have ${form} here before.`, '他们以前属于这里。']
+    if (slot === 'ing') return [`${cap} here matters.`, '属于这里很重要。']
+    return [`They ${form} here.`, '他们属于这里。']
+  }
+  if (pattern === 'consist') {
+    if (slot === 'past') return [`They ${form} of two parts yesterday.`, '它们昨天由两部分组成。']
+    if (slot === 'pp') return [`They have ${form} of two parts before.`, '它们以前由两部分组成过。']
+    if (slot === 'ing') return [`${cap} of two parts is common.`, '由两部分组成很常见。']
+    return [`They ${form} of two parts.`, '它们由两部分组成。']
+  }
+  if (pattern === 'cost') {
+    if (slot === 'past') return [`They ${form} money yesterday.`, '它们昨天要花钱。']
+    if (slot === 'pp') return [`They have ${form} money before.`, '它们以前要花过钱。']
+    if (slot === 'ing') return [`${cap} money is common.`, '花钱很常见。']
+    return [`They ${form} money.`, '它们要花钱。']
+  }
+  if (pattern === 'exist') {
+    if (slot === 'past') return [`They ${form} yesterday.`, '它们昨天存在。']
+    if (slot === 'pp') return [`They have ${form} before.`, '它们以前存在过。']
+    if (slot === 'ing') return [`${cap} takes time.`, '存在需要时间。']
+    return [`They ${form}.`, '它们存在。']
+  }
+  const object = pattern === 'obj' || pattern === 'stative-obj'
+  const stative = pattern === 'stative-obj' || pattern === 'stative-intrans'
+  if (slot === 'past') {
+    return object
+      ? [`They ${form} it yesterday.`, `他们昨天${zh}了。`]
+      : [`They ${form} yesterday.`, `他们昨天${zh}了。`]
+  }
+  if (slot === 'pp') {
+    return object
+      ? [`They have ${form} it before.`, `他们以前${zh}过。`]
+      : [`They have ${form} before.`, `他们以前${zh}过。`]
+  }
+  if (slot === 'ing') {
+    if (stative) {
+      return object ? [`${cap} it helps.`, `${zh}会有帮助。`] : [`${cap} takes time.`, `${zh}需要时间。`]
+    }
+    return object
+      ? [`They are ${form} it now.`, `他们现在正在${zh}。`]
+      : [`They are ${form} now.`, `他们现在正在${zh}。`]
+  }
+  return object
+    ? [`They ${form} it every day.`, `他们每天都${zh}。`]
+    : [`They ${form} every day.`, `他们每天都${zh}。`]
+}
+
+const VERBAL_GLOSS = /(?:学习|结束|控制|服务|研究|改变|变化|使用|报告|经过|帮助|支持|决定|开始|工作|经历|开放|爱|跑|读|写|说|看|听|想|做|用|给|拿|放|让|来|去)$/
+
+function displayGloss(senses) {
+  const verb = verbSense(senses)
+  if (verb?.zh) return shortGloss(verb.zh)
+  const first = shortGloss(senses?.[0]?.zh)
+  if (first && VERBAL_GLOSS.test(first)) return first
+  return ''
+}
+
+const CUSTOM_EXAMPLES = {
+  think(form, slot) {
+    if (slot === 'past') return [`They ${form} about it yesterday.`, '他们昨天想过这件事。']
+    if (slot === 'pp') return [`They have ${form} about it before.`, '他们以前想过这件事。']
+    if (slot === 'ing') return [`They are ${form} about it now.`, '他们正在想这件事。']
+    return [`They ${form} about it every day.`, '他们每天都想这件事。']
+  },
+  mean(form, slot) {
+    if (slot === 'past') return [`They ${form} it yesterday.`, '他们昨天就是这个意思。']
+    if (slot === 'pp') return [`They have ${form} it before.`, '他们以前就是这个意思。']
+    if (slot === 'ing') return [`${capWord(form)} it takes care.`, '把意思说清楚需要用心。']
+    return [`They ${form} it.`, '他们是这个意思。']
+  },
+  matter(form, slot) {
+    if (slot === 'past') return [`These things ${form} yesterday.`, '这些事昨天很重要。']
+    if (slot === 'pp') return [`These things have ${form} before.`, '这些事以前很重要。']
+    if (slot === 'ing') return null
+    return [`These things ${form}.`, '这些事很重要。']
+  },
+  let(form, slot) {
+    if (slot === 'past') return [`They ${form} it go yesterday.`, '他们昨天放手了。']
+    if (slot === 'pp') return [`They have ${form} it go before.`, '他们以前放手过。']
+    if (slot === 'ing') return [`They are ${form} it go now.`, '他们正在放手。']
+    return [`They ${form} it go.`, '他们放手。']
+  },
+  put(form, slot) {
+    if (slot === 'past') return [`They ${form} it down yesterday.`, '他们昨天把它放下了。']
+    if (slot === 'pp') return [`They have ${form} it down before.`, '他们以前把它放下过。']
+    if (slot === 'ing') return [`They are ${form} it down now.`, '他们正在把它放下。']
+    return [`They ${form} it down.`, '他们把它放下。']
+  },
+  tell(form, slot) {
+    if (slot === 'past') return [`They ${form} them yesterday.`, '他们昨天告诉了别人。']
+    if (slot === 'pp') return [`They have ${form} them before.`, '他们以前告诉过别人。']
+    if (slot === 'ing') return [`They are ${form} them now.`, '他们正在告诉别人。']
+    return [`They ${form} them every day.`, '他们每天都告诉别人。']
+  },
+}
+
+function verbExamples(base, form, slot, gloss, senses) {
+  const custom = CUSTOM_EXAMPLES[String(base || '').toLowerCase()]
+  if (custom) {
+    const line = custom(form, slot)
+    if (line) return [line]
+  }
+  return [exampleLine(examplePattern(base, gloss, senses), form, slot, gloss)]
+}
 
 const FUNCTION_WORDS = new Set(
   `a an the of to in on at for and or but if as by with from into onto than that this these those
@@ -102,9 +324,21 @@ export function describeForms(lines, senses, headword = '') {
     }
     const pos = match[1]
     const parts = match[2].split(' / ')
-    const names = pos === '动词' ? VERB_SLOTS : pos === '形容词' ? ADJECTIVE_SLOTS : pos === '名词' ? NOUN_SLOTS : null
+    const names = pos === '形容词' ? ADJECTIVE_SLOTS : pos === '名词' ? NOUN_SLOTS : null
+    const gloss = pos === '动词' ? displayGloss(senses) : ''
+    const base = String(parts[0] || headword || '').trim()
     parts.forEach((part, index) => {
-      pushForm(items, names?.[index] || '词形', pos, part)
+      const text = String(part || '').trim()
+      if (pos === '动词') {
+        if (!text || text === '—') return
+        items.push({
+          label: VERB_LABELS[index] || 'form',
+          word: text,
+          examples: verbExamples(base, text, VERB_SLOTS[index], gloss, senses),
+        })
+        return
+      }
+      pushForm(items, names?.[index] || '词形', pos, text)
     })
   }
   return items
