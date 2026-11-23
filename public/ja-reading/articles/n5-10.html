@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>図書館の本 · N5 · 日语阅读</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <article class="page">
+    <p class="column">日语阅读 · 每日一篇</p>
+    <div class="title-row">
+      <p class="level">N5</p>
+      <div class="titles">
+        <h1>図書館の本</h1>
+        <p class="title-zh">图书馆的书</p>
+      </div>
+      <div class="decor" aria-hidden="true"><svg class="decor-svg" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><path d="M22 28 L58 22 L58 96 L22 100 Z" fill="#7EA4D8" stroke="#3A4458" stroke-width="1.5"/><path d="M98 28 L62 22 L62 96 L98 100 Z" fill="#FFF6D8" stroke="#3A4458" stroke-width="1.5"/><line x1="70" y1="38" x2="90" y2="40" stroke="#5B86C6" stroke-width="2"/><line x1="70" y1="50" x2="88" y2="52" stroke="#D5DBE8" stroke-width="2"/><line x1="70" y1="62" x2="86" y2="64" stroke="#D5DBE8" stroke-width="2"/></svg></div>
+    </div>
+
+    <div class="player" data-role="reader">
+      <button type="button" class="play" id="play">播放</button>
+      <button type="button" class="pause" id="pause">暂停/继续</button>
+      <button type="button" class="stop" id="stop">停止</button>
+      <label>语速
+        <select id="rate" aria-label="语速">
+          <option value="0.7">慢</option>
+          <option value="0.85">较慢</option>
+          <option value="1" selected>正常</option>
+          <option value="1.15">稍快</option>
+        </select>
+      </label>
+      <div class="voice-hint" id="voice-hint" hidden>
+        未检测到日语（ja-JP）语音。假名仍可正常显示，但朗读无法使用。可按下面的方法添加日语语音后，重新打开本页：
+        <br>iPhone / iPad：打开「设置」→「辅助功能」→「朗读内容」→「声音」，下载「日语」。也可在「设置」→「通用」→「语言与地区」中添加日语。
+        <br>Mac：打开「系统设置」→「辅助功能」→「朗读内容」（有的版本写作「口头内容」），在声音列表中下载日语；也可在「系统设置」→「通用」→「语言与地区」添加日语。
+        <br>Windows：打开「设置」→「时间和语言」→「语言和区域」，添加日语并下载语言包；再在「设置」→「时间和语言」→「语音」中确认已安装日语语音。然后重新打开本页。
+      </div>
+    </div>
+
+    <script type="application/json" id="speech-source">{"text": "水曜日の午後、私は町の図書館へ行きます。図書館は駅の近くです。中は静かです。大きい机と長い棚があります。棚に本がたくさんあります。私は動物の本が好きです。今日は猫の本と鳥の本を見ます。絵がきれいで、ことばもわかりやすいです。私は窓の近くの席に座ります。二時間ぐらい本を読みます。時々、ノートにことばを書きます。となりの人は学生です。その人も静かに勉強しています。四時に私は本を二冊借ります。図書館の人に「カードを見せてください」と言います。私はカードを出します。来週の水曜日までに返します。外へ出ると、空はもう少し暗いです。本はかばんの中にあります。家でまた読みたいです。図書館は私の好きな場所です。"}</script>
+
+    <div class="body-ja" lang="ja">
+      <p><ruby>水曜日<rt>すいようび</rt></ruby>の<ruby>午後<rt>ごご</rt></ruby>、<ruby>私<rt>わたし</rt></ruby>は<ruby>町<rt>まち</rt></ruby>の<ruby>図書<rt>としょ</rt></ruby><ruby>館<rt>かん</rt></ruby>へ<ruby>行<rt>い</rt></ruby>きます。</p>
+      <p><ruby>図書<rt>としょ</rt></ruby><ruby>館<rt>かん</rt></ruby>は<ruby>駅<rt>えき</rt></ruby>の<ruby>近<rt>ちか</rt></ruby>くです。</p>
+      <p><ruby>中<rt>なか</rt></ruby>は<ruby>静<rt>しず</rt></ruby>かです。</p>
+      <p><ruby>大<rt>おお</rt></ruby>きい<ruby>机<rt>つくえ</rt></ruby>と<ruby>長<rt>なが</rt></ruby>い<ruby>棚<rt>たな</rt></ruby>があります。</p>
+      <p><ruby>棚<rt>たな</rt></ruby>に<ruby>本<rt>ほん</rt></ruby>がたくさんあります。</p>
+      <p><ruby>私<rt>わたし</rt></ruby>は<ruby>動物<rt>どうぶつ</rt></ruby>の<ruby>本<rt>ほん</rt></ruby>が<ruby>好<rt>す</rt></ruby>きです。</p>
+      <p><ruby>今日<rt>きょう</rt></ruby>は<ruby>猫<rt>ねこ</rt></ruby>の<ruby>本<rt>ほん</rt></ruby>と<ruby>鳥<rt>とり</rt></ruby>の<ruby>本<rt>ほん</rt></ruby>を<ruby>見<rt>み</rt></ruby>ます。</p>
+      <p><ruby>絵<rt>え</rt></ruby>がきれいで、ことばもわかりやすいです。</p>
+      <p><ruby>私<rt>わたし</rt></ruby>は<ruby>窓<rt>まど</rt></ruby>の<ruby>近<rt>ちか</rt></ruby>くの<ruby>席<rt>せき</rt></ruby>に<ruby>座<rt>すわ</rt></ruby>ります。</p>
+      <p><ruby>二時間<rt>にじかん</rt></ruby>ぐらい<ruby>本<rt>ほん</rt></ruby>を<ruby>読<rt>よ</rt></ruby>みます。</p>
+      <p><ruby>時々<rt>ときどき</rt></ruby>、ノートにことばを<ruby>書<rt>か</rt></ruby>きます。</p>
+      <p>となりの<ruby>人<rt>ひと</rt></ruby>は<ruby>学生<rt>がくせい</rt></ruby>です。</p>
+      <p>その<ruby>人<rt>ひと</rt></ruby>も<ruby>静<rt>しず</rt></ruby>かに<ruby>勉強<rt>べんきょう</rt></ruby>しています。</p>
+      <p><ruby>四時<rt>よじ</rt></ruby>に<ruby>私<rt>わたし</rt></ruby>は<ruby>本<rt>ほん</rt></ruby>を<ruby>二冊<rt>にさつ</rt></ruby><ruby>借<rt>か</rt></ruby>ります。</p>
+      <p><ruby>図書<rt>としょ</rt></ruby><ruby>館<rt>かん</rt></ruby>の<ruby>人<rt>ひと</rt></ruby>に「カードを<ruby>見<rt>み</rt></ruby>せてください」と<ruby>言<rt>い</rt></ruby>います。</p>
+      <p><ruby>私<rt>わたし</rt></ruby>はカードを<ruby>出<rt>だ</rt></ruby>します。</p>
+      <p><ruby>来週<rt>らいしゅう</rt></ruby>の<ruby>水曜日<rt>すいようび</rt></ruby>までに<ruby>返<rt>かえ</rt></ruby>します。</p>
+      <p><ruby>外<rt>そと</rt></ruby>へ<ruby>出<rt>で</rt></ruby>ると、<ruby>空<rt>そら</rt></ruby>はもう<ruby>少<rt>すこ</rt></ruby>し<ruby>暗<rt>くら</rt></ruby>いです。</p>
+      <p><ruby>本<rt>ほん</rt></ruby>はかばんの<ruby>中<rt>なか</rt></ruby>にあります。</p>
+      <p><ruby>家<rt>いえ</rt></ruby>でまた<ruby>読<rt>よ</rt></ruby>みたいです。</p>
+      <p><ruby>図書<rt>としょ</rt></ruby><ruby>館<rt>かん</rt></ruby>は<ruby>私<rt>わたし</rt></ruby>の<ruby>好<rt>す</rt></ruby>きな<ruby>場所<rt>ばしょ</rt></ruby>です。</p>
+    </div>
+
+    <div class="body-zh" lang="zh-CN">
+      <p>星期三下午，我去镇上的图书馆。图书馆在车站附近，里面很安静。有大桌子和长书架。架子上有很多书。我喜欢动物类的书。今天我看了关于猫的书和关于鸟的书。</p>
+      <p>图画很美，句子也容易懂。我坐在靠窗的座位，读了大约两个小时。有时会把词语写在笔记本上。旁边的人是学生，也在安静地学习。四点，我借了两本书。图书馆的工作人员说「请出示借书卡」。</p>
+      <p>我拿出了卡片。我会在下星期三之前还书。走到外面，天空已经稍微暗了一些。书在我的包里。回到家还想再读。图书馆是我喜欢的地方。</p>
+    </div>
+
+    <p class="note">本文是学习用原创练习稿。等级为编辑估计，不是日语能力考试（JLPT）的官方认定。正文 300 个字符（汉字、假名、标点计入，空白不计入）。</p>
+    <nav class="nav">      <a href="../index.html">返回目录</a> · <a href="n5-09.html">上一篇</a> · <a href="n5-11.html">下一篇</a></nav>
+  </article>
+  <script src="../js/player.js"></script>
+</body>
+</html>

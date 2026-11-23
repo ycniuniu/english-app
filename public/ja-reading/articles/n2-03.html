@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>学びにおける自主性 · N2 · 日语阅读</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <article class="page">
+    <p class="column">日语阅读 · 每日一篇</p>
+    <div class="title-row">
+      <p class="level">N2</p>
+      <div class="titles">
+        <h1>学びにおける自主性</h1>
+        <p class="title-zh">学习中的自主性</p>
+      </div>
+      <div class="decor" aria-hidden="true"><svg class="decor-svg" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><rect x="22" y="44" width="76" height="52" fill="#FFF6D8" stroke="#3A4458" stroke-width="2"/><polygon points="16,44 60,16 104,44" fill="#E9897A"/><rect x="52" y="66" width="16" height="30" fill="#5B86C6"/><rect x="32" y="56" width="12" height="12" fill="#7EA4D8"/><rect x="76" y="56" width="12" height="12" fill="#7EA4D8"/><rect x="56" y="22" width="8" height="14" fill="#3A4458"/></svg></div>
+    </div>
+
+    <div class="player" data-role="reader">
+      <button type="button" class="play" id="play">播放</button>
+      <button type="button" class="pause" id="pause">暂停/继续</button>
+      <button type="button" class="stop" id="stop">停止</button>
+      <label>语速
+        <select id="rate" aria-label="语速">
+          <option value="0.7">慢</option>
+          <option value="0.85">较慢</option>
+          <option value="1" selected>正常</option>
+          <option value="1.15">稍快</option>
+        </select>
+      </label>
+      <div class="voice-hint" id="voice-hint" hidden>
+        未检测到日语（ja-JP）语音。假名仍可正常显示，但朗读无法使用。可按下面的方法添加日语语音后，重新打开本页：
+        <br>iPhone / iPad：打开「设置」→「辅助功能」→「朗读内容」→「声音」，下载「日语」。也可在「设置」→「通用」→「语言与地区」中添加日语。
+        <br>Mac：打开「系统设置」→「辅助功能」→「朗读内容」（有的版本写作「口头内容」），在声音列表中下载日语；也可在「系统设置」→「通用」→「语言与地区」添加日语。
+        <br>Windows：打开「设置」→「时间和语言」→「语言和区域」，添加日语并下载语言包；再在「设置」→「时间和语言」→「语音」中确认已安装日语语音。然后重新打开本页。
+      </div>
+    </div>
+
+    <script type="application/json" id="speech-source">{"text": "学校では、自ら課題を見つけて取り組む力が重視されるようになった。与えられた問題を速く解くだけではなく、なぜそれが問題なのかを考えることが求められる。方向としては妥当だろう。ただし、自主性を強調するあまり、必要な支えまで省いてしまっては本末転倒である。自分で決める力は、何もない場所から突然生まれるものではない。まず、基礎的な知識や、失敗してもやり直せる環境が必要だ。自由を与えられただけで成長する生徒もいるが、多くの場合、適切な例と、途中での助言があって初めて方向が見える。また、自主性は性格の問題にされやすい。積極的に発言する人が自主的で、静かに考え込む人がそうでない、と早合点してはならない。考えをまとめる速さは人それぞれであり、評価の方法が一つの型に偏ると、見える力だけが過大に評価される。教師の側にも負担がある。一人一人に合わせた支援は、時間も準備も増える。理念だけが先行して、現場の余裕がなければ、形だけの探究になりかねない。自主性を育てるとは、放っておくことではない。必要な枠を示したうえで、その内側で選ばせることだ。選んだ結果に責任を持たせるには、選ぶ前の材料を十分に渡しておくべきである。"}</script>
+
+    <div class="body-ja" lang="ja">
+      <p><ruby>学校<rt>がっこう</rt></ruby>では、<ruby>自<rt>みずか</rt></ruby>ら<ruby>課題<rt>かだい</rt></ruby>を<ruby>見<rt>み</rt></ruby>つけて<ruby>取<rt>と</rt></ruby>り<ruby>組<rt>く</rt></ruby>む<ruby>力<rt>ちから</rt></ruby>が<ruby>重視<rt>じゅうし</rt></ruby>されるようになった。</p>
+      <p><ruby>与<rt>あた</rt></ruby>えられた<ruby>問題<rt>もんだい</rt></ruby>を<ruby>速<rt>はや</rt></ruby>く<ruby>解<rt>と</rt></ruby>くだけではなく、なぜそれが<ruby>問題<rt>もんだい</rt></ruby>なのかを<ruby>考<rt>かんが</rt></ruby>えることが<ruby>求<rt>もと</rt></ruby>められる。</p>
+      <p><ruby>方向<rt>ほうこう</rt></ruby>としては<ruby>妥当<rt>だとう</rt></ruby>だろう。</p>
+      <p>ただし、<ruby>自主<rt>じしゅ</rt></ruby><ruby>性<rt>せい</rt></ruby>を<ruby>強調<rt>きょうちょう</rt></ruby>するあまり、<ruby>必要<rt>ひつよう</rt></ruby>な<ruby>支<rt>ささ</rt></ruby>えまで<ruby>省<rt>はぶ</rt></ruby>いてしまっては<ruby>本末<rt>ほんまつ</rt></ruby><ruby>転倒<rt>てんとう</rt></ruby>である。</p>
+      <p><ruby>自分<rt>じぶん</rt></ruby>で<ruby>決<rt>き</rt></ruby>める<ruby>力<rt>ちから</rt></ruby>は、<ruby>何<rt>なん</rt></ruby>もない<ruby>場所<rt>ばしょ</rt></ruby>から<ruby>突然<rt>とつぜん</rt></ruby><ruby>生<rt>う</rt></ruby>まれるものではない。</p>
+      <p>まず、<ruby>基礎<rt>きそ</rt></ruby><ruby>的<rt>てき</rt></ruby>な<ruby>知識<rt>ちしき</rt></ruby>や、<ruby>失敗<rt>しっぱい</rt></ruby>してもやり<ruby>直<rt>なお</rt></ruby>せる<ruby>環境<rt>かんきょう</rt></ruby>が<ruby>必要<rt>ひつよう</rt></ruby>だ。</p>
+      <p><ruby>自由<rt>じゆう</rt></ruby>を<ruby>与<rt>あた</rt></ruby>えられただけで<ruby>成長<rt>せいちょう</rt></ruby>する<ruby>生徒<rt>せいと</rt></ruby>もいるが、<ruby>多<rt>おお</rt></ruby>くの<ruby>場合<rt>ばあい</rt></ruby>、<ruby>適切<rt>てきせつ</rt></ruby>な<ruby>例<rt>れい</rt></ruby>と、<ruby>途中<rt>とちゅう</rt></ruby>での<ruby>助言<rt>じょげん</rt></ruby>があって<ruby>初<rt>はじ</rt></ruby>めて<ruby>方向<rt>ほうこう</rt></ruby>が<ruby>見<rt>み</rt></ruby>える。</p>
+      <p>また、<ruby>自主<rt>じしゅ</rt></ruby><ruby>性<rt>せい</rt></ruby>は<ruby>性格<rt>せいかく</rt></ruby>の<ruby>問題<rt>もんだい</rt></ruby>にされやすい。</p>
+      <p><ruby>積極<rt>せっきょく</rt></ruby><ruby>的<rt>てき</rt></ruby>に<ruby>発言<rt>はつげん</rt></ruby>する<ruby>人<rt>ひと</rt></ruby>が<ruby>自主<rt>じしゅ</rt></ruby><ruby>的<rt>てき</rt></ruby>で、<ruby>静<rt>しず</rt></ruby>かに<ruby>考<rt>かんが</rt></ruby>え<ruby>込<rt>こ</rt></ruby>む<ruby>人<rt>ひと</rt></ruby>がそうでない、と<ruby>早<rt>はや</rt></ruby><ruby>合点<rt>がてん</rt></ruby>してはならない。</p>
+      <p><ruby>考<rt>かんが</rt></ruby>えをまとめる<ruby>速<rt>はや</rt></ruby>さは<ruby>人<rt>ひと</rt></ruby>それぞれであり、<ruby>評価<rt>ひょうか</rt></ruby>の<ruby>方法<rt>ほうほう</rt></ruby>が<ruby>一<rt>ひと</rt></ruby>つの<ruby>型<rt>かた</rt></ruby>に<ruby>偏<rt>かたよ</rt></ruby>ると、<ruby>見<rt>み</rt></ruby>える<ruby>力<rt>ちから</rt></ruby>だけが<ruby>過大<rt>かだい</rt></ruby>に<ruby>評価<rt>ひょうか</rt></ruby>される。</p>
+      <p><ruby>教師<rt>きょうし</rt></ruby>の<ruby>側<rt>がわ</rt></ruby>にも<ruby>負担<rt>ふたん</rt></ruby>がある。</p>
+      <p><ruby>一人一人<rt>ひとりひとり</rt></ruby>に<ruby>合<rt>あ</rt></ruby>わせた<ruby>支援<rt>しえん</rt></ruby>は、<ruby>時間<rt>じかん</rt></ruby>も<ruby>準備<rt>じゅんび</rt></ruby>も<ruby>増<rt>ふ</rt></ruby>える。</p>
+      <p><ruby>理念<rt>りねん</rt></ruby>だけが<ruby>先行<rt>せんこう</rt></ruby>して、<ruby>現場<rt>げんば</rt></ruby>の<ruby>余裕<rt>よゆう</rt></ruby>がなければ、<ruby>形<rt>かたち</rt></ruby>だけの<ruby>探究<rt>たんきゅう</rt></ruby>になりかねない。</p>
+      <p><ruby>自主<rt>じしゅ</rt></ruby><ruby>性<rt>せい</rt></ruby>を<ruby>育<rt>そだ</rt></ruby>てるとは、<ruby>放<rt>ほう</rt></ruby>っておくことではない。</p>
+      <p><ruby>必要<rt>ひつよう</rt></ruby>な<ruby>枠<rt>わく</rt></ruby>を<ruby>示<rt>しめ</rt></ruby>したうえで、その<ruby>内側<rt>うちがわ</rt></ruby>で<ruby>選<rt>えら</rt></ruby>ばせることだ。</p>
+      <p><ruby>選<rt>えら</rt></ruby>んだ<ruby>結果<rt>けっか</rt></ruby>に<ruby>責任<rt>せきにん</rt></ruby>を<ruby>持<rt>も</rt></ruby>たせるには、<ruby>選<rt>えら</rt></ruby>ぶ<ruby>前<rt>まえ</rt></ruby>の<ruby>材料<rt>ざいりょう</rt></ruby>を<ruby>十分<rt>じゅうぶん</rt></ruby>に<ruby>渡<rt>わた</rt></ruby>しておくべきである。</p>
+    </div>
+
+    <div class="body-zh" lang="zh-CN">
+      <p>学校里开始重视自己发现问题并着手解决的能力。不只是更快解出被给出的题目，还被要求思考它为什么会成为问题。方向上大概是妥当的。不过，若因强调自主而连必要的支撑也省掉，就本末倒置了。</p>
+      <p>自己做决定的能力，并不是从空白的地方突然产生的。首先需要基础的知识，以及即使失败也能重来的环境。也有学生只要被给予自由就能成长，但多数情况下，要有合适的例子和过程中的建议，方向才会显现。</p>
+      <p>另外，自主性也容易被说成性格问题。不能匆匆断定：积极发言的才是自主的，安静思考的就不是。整理想法的速度因人而异，评价方式若偏于一种类型，就只会过分看重看得见的能力。</p>
+      <p>教师一边也有负担。按每个人来支援，时间和准备都会增加。如果只有理念先行，现场却没有余地，就可能变成徒有形式的探究。培养自主，并不是放着不管。</p>
+      <p>而是先出示必要的框架，再让人在那内部去做选择。若要让人对选择的结果负责，就应该在选择之前把材料给足。</p>
+    </div>
+
+    <p class="note">本文是学习用原创练习稿。等级为编辑估计，不是日语能力考试（JLPT）的官方认定。正文 502 个字符（汉字、假名、标点计入，空白不计入）。</p>
+    <nav class="nav">      <a href="../index.html">返回目录</a> · <a href="n2-02.html">上一篇</a> · <a href="n2-04.html">下一篇</a></nav>
+  </article>
+  <script src="../js/player.js"></script>
+</body>
+</html>

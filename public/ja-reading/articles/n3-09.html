@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>日記を続ける · N3 · 日语阅读</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <article class="page">
+    <p class="column">日语阅读 · 每日一篇</p>
+    <div class="title-row">
+      <p class="level">N3</p>
+      <div class="titles">
+        <h1>日記を続ける</h1>
+        <p class="title-zh">把日记写下去</p>
+      </div>
+      <div class="decor" aria-hidden="true"><svg class="decor-svg" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><rect x="24" y="28" width="72" height="68" rx="4" fill="#FFFDF8" stroke="#3A4458" stroke-width="2"/><line x1="36" y1="48" x2="84" y2="48" stroke="#5B86C6" stroke-width="3"/><line x1="36" y1="62" x2="84" y2="62" stroke="#D5DBE8" stroke-width="3"/><line x1="36" y1="76" x2="70" y2="76" stroke="#D5DBE8" stroke-width="3"/></svg></div>
+    </div>
+
+    <div class="player" data-role="reader">
+      <button type="button" class="play" id="play">播放</button>
+      <button type="button" class="pause" id="pause">暂停/继续</button>
+      <button type="button" class="stop" id="stop">停止</button>
+      <label>语速
+        <select id="rate" aria-label="语速">
+          <option value="0.7">慢</option>
+          <option value="0.85">较慢</option>
+          <option value="1" selected>正常</option>
+          <option value="1.15">稍快</option>
+        </select>
+      </label>
+      <div class="voice-hint" id="voice-hint" hidden>
+        未检测到日语（ja-JP）语音。假名仍可正常显示，但朗读无法使用。可按下面的方法添加日语语音后，重新打开本页：
+        <br>iPhone / iPad：打开「设置」→「辅助功能」→「朗读内容」→「声音」，下载「日语」。也可在「设置」→「通用」→「语言与地区」中添加日语。
+        <br>Mac：打开「系统设置」→「辅助功能」→「朗读内容」（有的版本写作「口头内容」），在声音列表中下载日语；也可在「系统设置」→「通用」→「语言与地区」添加日语。
+        <br>Windows：打开「设置」→「时间和语言」→「语言和区域」，添加日语并下载语言包；再在「设置」→「时间和语言」→「语音」中确认已安装日语语音。然后重新打开本页。
+      </div>
+    </div>
+
+    <script type="application/json" id="speech-source">{"text": "日本語の勉強を始めて二年目に、私は短い日記を書くことにしました。最初は五行使くのが精いっぱいでした。文法を間違えないことばかり考えて、内容が薄くなっていました。ある日、先生に「正しさより、その日の具体的なことを書いてください」と言われました。それから、見た空の色や、誰と何を話したかを先に書くようにしました。間違いがあっても、後で直せます。三か月続けると、同じ表現ばかり使っている自分に気づきました。「楽しかった」で終わらせず、何が楽しかったのかを足すようにしています。語彙は、必要になった時に調べると覚えやすいです。書けない日もあります。そんな時は、一行だけ日付と天気を書いておくことにしています。空白のままにするより、続く感覚が残るからです。古いページを読み返すと、当時の自分が何を気にしていたかがわかります。上達だけでなく、時間の記録にもなっているところが、日記の良い点です。完璧な文章を目指すと続きません。下手でも、今週の自分を残しておくことが、来月の自分を助けます。だから、今夜も短い一段を書くつもりです。"}</script>
+
+    <div class="body-ja" lang="ja">
+      <p><ruby>日本語<rt>にほんご</rt></ruby>の<ruby>勉強<rt>べんきょう</rt></ruby>を<ruby>始<rt>はじ</rt></ruby>めて<ruby>二年目<rt>にねんめ</rt></ruby>に、<ruby>私<rt>わたし</rt></ruby>は<ruby>短<rt>みじか</rt></ruby>い<ruby>日記<rt>にっき</rt></ruby>を<ruby>書<rt>か</rt></ruby>くことにしました。</p>
+      <p><ruby>最初<rt>さいしょ</rt></ruby>は<ruby>五行<rt>ごぎょう</rt></ruby><ruby>使<rt>し</rt></ruby>くのが<ruby>精<rt>せい</rt></ruby>いっぱいでした。</p>
+      <p><ruby>文法<rt>ぶんぽう</rt></ruby>を<ruby>間違<rt>まちが</rt></ruby>えないことばかり<ruby>考<rt>かんが</rt></ruby>えて、<ruby>内容<rt>ないよう</rt></ruby>が<ruby>薄<rt>うす</rt></ruby>くなっていました。</p>
+      <p>ある<ruby>日<rt>ひ</rt></ruby>、<ruby>先生<rt>せんせい</rt></ruby>に「<ruby>正<rt>ただ</rt></ruby>しさより、その<ruby>日<rt>ひ</rt></ruby>の<ruby>具体<rt>ぐたい</rt></ruby><ruby>的<rt>てき</rt></ruby>なことを<ruby>書<rt>か</rt></ruby>いてください」と<ruby>言<rt>い</rt></ruby>われました。</p>
+      <p>それから、<ruby>見<rt>み</rt></ruby>た<ruby>空<rt>そら</rt></ruby>の<ruby>色<rt>いろ</rt></ruby>や、<ruby>誰<rt>だれ</rt></ruby>と<ruby>何<rt>なん</rt></ruby>を<ruby>話<rt>はな</rt></ruby>したかを<ruby>先<rt>さき</rt></ruby>に<ruby>書<rt>か</rt></ruby>くようにしました。</p>
+      <p><ruby>間違<rt>まちが</rt></ruby>いがあっても、<ruby>後<rt>あと</rt></ruby>で<ruby>直<rt>なお</rt></ruby>せます。</p>
+      <p><ruby>三か月<rt>さんかげつ</rt></ruby><ruby>続<rt>つづ</rt></ruby>けると、<ruby>同<rt>おな</rt></ruby>じ<ruby>表現<rt>ひょうげん</rt></ruby>ばかり<ruby>使<rt>つか</rt></ruby>っている<ruby>自分<rt>じぶん</rt></ruby>に<ruby>気<rt>き</rt></ruby>づきました。</p>
+      <p>「<ruby>楽<rt>たの</rt></ruby>しかった」で<ruby>終<rt>お</rt></ruby>わらせず、<ruby>何<rt>なん</rt></ruby>が<ruby>楽<rt>たの</rt></ruby>しかったのかを<ruby>足<rt>た</rt></ruby>すようにしています。</p>
+      <p><ruby>語彙<rt>ごい</rt></ruby>は、<ruby>必要<rt>ひつよう</rt></ruby>になった<ruby>時<rt>とき</rt></ruby>に<ruby>調<rt>しら</rt></ruby>べると<ruby>覚<rt>おぼ</rt></ruby>えやすいです。</p>
+      <p><ruby>書<rt>か</rt></ruby>けない<ruby>日<rt>ひ</rt></ruby>もあります。</p>
+      <p>そんな<ruby>時<rt>とき</rt></ruby>は、<ruby>一行<rt>いちぎょう</rt></ruby>だけ<ruby>日付<rt>ひづけ</rt></ruby>と<ruby>天気<rt>てんき</rt></ruby>を<ruby>書<rt>か</rt></ruby>いておくことにしています。</p>
+      <p><ruby>空白<rt>くうはく</rt></ruby>のままにするより、<ruby>続<rt>つづ</rt></ruby>く<ruby>感覚<rt>かんかく</rt></ruby>が<ruby>残<rt>のこ</rt></ruby>るからです。</p>
+      <p><ruby>古<rt>ふる</rt></ruby>いページを<ruby>読<rt>よ</rt></ruby>み<ruby>返<rt>かえ</rt></ruby>すと、<ruby>当時<rt>とうじ</rt></ruby>の<ruby>自分<rt>じぶん</rt></ruby>が<ruby>何<rt>なん</rt></ruby>を<ruby>気<rt>き</rt></ruby>にしていたかがわかります。</p>
+      <p><ruby>上達<rt>じょうたつ</rt></ruby>だけでなく、<ruby>時間<rt>じかん</rt></ruby>の<ruby>記録<rt>きろく</rt></ruby>にもなっているところが、<ruby>日記<rt>にっき</rt></ruby>の<ruby>良<rt>よ</rt></ruby>い<ruby>点<rt>てん</rt></ruby>です。</p>
+      <p><ruby>完璧<rt>かんぺき</rt></ruby>な<ruby>文章<rt>ぶんしょう</rt></ruby>を<ruby>目指<rt>めざ</rt></ruby>すと<ruby>続<rt>つづ</rt></ruby>きません。</p>
+      <p><ruby>下手<rt>へた</rt></ruby>でも、<ruby>今週<rt>こんしゅう</rt></ruby>の<ruby>自分<rt>じぶん</rt></ruby>を<ruby>残<rt>のこ</rt></ruby>しておくことが、<ruby>来月<rt>らいげつ</rt></ruby>の<ruby>自分<rt>じぶん</rt></ruby>を<ruby>助<rt>たす</rt></ruby>けます。</p>
+      <p>だから、<ruby>今夜<rt>こんや</rt></ruby>も<ruby>短<rt>みじか</rt></ruby>い<ruby>一<rt>いち</rt></ruby><ruby>段<rt>だん</rt></ruby>を<ruby>書<rt>か</rt></ruby>くつもりです。</p>
+    </div>
+
+    <div class="body-zh" lang="zh-CN">
+      <p>日语学习进入第二年时，我决定写短日记。一开始能写满五行就已经很不容易。满脑子只想着不要写错语法，内容却变得很薄。有一天，老师说：「与其追求正确，不如写下那天具体的事情。</p>
+      <p>」从那以后，我会先写看到的天空颜色，以及和谁说了什么。即使有错，以后也能改。坚持了三个月，才发现自己总在使用相同的表达。我不再只以「很愉快」收尾，而会补上究竟愉快在哪里。</p>
+      <p>词汇在真正需要的时候去查，会更好记。也有写不出来的日子。那种时候，我约定只写一行日期和天气。比起完全留白，这样还能留下在继续的感觉。翻看以前的页，就能明白当时的自己在意什么。</p>
+      <p>日记的好处是，它不仅关乎进步，也成了时间的记录。一追求完美的文章就无法持续。即使写得不好，把这个星期的自己留下来，也会帮助下个月的自己。所以今晚，我也打算写上短短一段。</p>
+    </div>
+
+    <p class="note">本文是学习用原创练习稿。等级为编辑估计，不是日语能力考试（JLPT）的官方认定。正文 458 个字符（汉字、假名、标点计入，空白不计入）。</p>
+    <nav class="nav">      <a href="../index.html">返回目录</a> · <a href="n3-08.html">上一篇</a> · <a href="n3-10.html">下一篇</a></nav>
+  </article>
+  <script src="../js/player.js"></script>
+</body>
+</html>

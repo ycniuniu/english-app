@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>表示を読んで買う · N2 · 日语阅读</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <article class="page">
+    <p class="column">日语阅读 · 每日一篇</p>
+    <div class="title-row">
+      <p class="level">N2</p>
+      <div class="titles">
+        <h1>表示を読んで買う</h1>
+        <p class="title-zh">读标识再购买</p>
+      </div>
+      <div class="decor" aria-hidden="true"><svg class="decor-svg" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><path d="M60 36 Q28 40 28 72 Q28 102 60 102 Q92 102 92 72 Q92 40 60 36 Z" fill="#E9897A"/><path d="M60 36 Q50 22 58 16" fill="none" stroke="#C49A6C" stroke-width="4" stroke-linecap="round"/><path d="M62 24 Q78 18 80 32 Q68 34 62 24 Z" fill="#8FBE7A"/><ellipse cx="48" cy="64" rx="6" ry="10" fill="#F4C3C0" opacity="0.8"/></svg></div>
+    </div>
+
+    <div class="player" data-role="reader">
+      <button type="button" class="play" id="play">播放</button>
+      <button type="button" class="pause" id="pause">暂停/继续</button>
+      <button type="button" class="stop" id="stop">停止</button>
+      <label>语速
+        <select id="rate" aria-label="语速">
+          <option value="0.7">慢</option>
+          <option value="0.85">较慢</option>
+          <option value="1" selected>正常</option>
+          <option value="1.15">稍快</option>
+        </select>
+      </label>
+      <div class="voice-hint" id="voice-hint" hidden>
+        未检测到日语（ja-JP）语音。假名仍可正常显示，但朗读无法使用。可按下面的方法添加日语语音后，重新打开本页：
+        <br>iPhone / iPad：打开「设置」→「辅助功能」→「朗读内容」→「声音」，下载「日语」。也可在「设置」→「通用」→「语言与地区」中添加日语。
+        <br>Mac：打开「系统设置」→「辅助功能」→「朗读内容」（有的版本写作「口头内容」），在声音列表中下载日语；也可在「系统设置」→「通用」→「语言与地区」添加日语。
+        <br>Windows：打开「设置」→「时间和语言」→「语言和区域」，添加日语并下载语言包；再在「设置」→「时间和语言」→「语音」中确认已安装日语语音。然后重新打开本页。
+      </div>
+    </div>
+
+    <script type="application/json" id="speech-source">{"text": "食品の包装には、原材料、添加物、産地、期限など、多くの情報が並んでいる。以前より詳しくなったことは確かだ。だが、文字量が増えるほど、読む側が要点をつかめなくなることもある。情報が公開されていることと、理解されていることは同じではない。消費者がすべての専門語を覚える必要はない。しかし、自分にとって重要な項目だけは確認する習慣を持ちたい。アレルギー、塩分、原産地。目的がはっきりしていれば、表示は読みやすくなる。企業の側にも責任がある。小さく薄い文字で重要な注意を隠すようなデザインは、形式的には書いてあっても、実質的な説明とは言いがたい。わかりやすくすることは、販売の技術である以上に、信頼の条件である。安さや便利さだけを優先すると、表示を見る余裕は失われやすい。急いでいるときほど、目立つ宣伝文句に目が行く。だからこそ、普段から比較の軸を決めておくことが防御になる。毎回完璧に調べる必要はない。疑わしいとき、立ち止まることができれば十分だ。食べることは日常の行為だが、その選択の積み重ねは体と環境に残る。表示を読むのは、小さな確認にすぎない。それでも、自分の選択に説明を与える第一歩になる。"}</script>
+
+    <div class="body-ja" lang="ja">
+      <p><ruby>食品<rt>しょくひん</rt></ruby>の<ruby>包装<rt>ほうそう</rt></ruby>には、<ruby>原<rt>げん</rt></ruby><ruby>材料<rt>ざいりょう</rt></ruby>、<ruby>添加<rt>てんか</rt></ruby><ruby>物<rt>ぶつ</rt></ruby>、<ruby>産地<rt>さんち</rt></ruby>、<ruby>期限<rt>きげん</rt></ruby>など、<ruby>多<rt>おお</rt></ruby>くの<ruby>情報<rt>じょうほう</rt></ruby>が<ruby>並<rt>なら</rt></ruby>んでいる。</p>
+      <p><ruby>以前<rt>いぜん</rt></ruby>より<ruby>詳<rt>くわ</rt></ruby>しくなったことは<ruby>確<rt>たし</rt></ruby>かだ。</p>
+      <p>だが、<ruby>文字<rt>もじ</rt></ruby><ruby>量<rt>りょう</rt></ruby>が<ruby>増<rt>ふ</rt></ruby>えるほど、<ruby>読<rt>よ</rt></ruby>む<ruby>側<rt>がわ</rt></ruby>が<ruby>要点<rt>ようてん</rt></ruby>をつかめなくなることもある。</p>
+      <p><ruby>情報<rt>じょうほう</rt></ruby>が<ruby>公開<rt>こうかい</rt></ruby>されていることと、<ruby>理解<rt>りかい</rt></ruby>されていることは<ruby>同<rt>おな</rt></ruby>じではない。</p>
+      <p><ruby>消費<rt>しょうひ</rt></ruby><ruby>者<rt>しゃ</rt></ruby>がすべての<ruby>専門<rt>せんもん</rt></ruby><ruby>語<rt>ご</rt></ruby>を<ruby>覚<rt>おぼ</rt></ruby>える<ruby>必要<rt>ひつよう</rt></ruby>はない。</p>
+      <p>しかし、<ruby>自分<rt>じぶん</rt></ruby>にとって<ruby>重要<rt>じゅうよう</rt></ruby>な<ruby>項目<rt>こうもく</rt></ruby>だけは<ruby>確認<rt>かくにん</rt></ruby>する<ruby>習慣<rt>しゅうかん</rt></ruby>を<ruby>持<rt>も</rt></ruby>ちたい。</p>
+      <p>アレルギー、<ruby>塩分<rt>えんぶん</rt></ruby>、<ruby>原産<rt>げんさん</rt></ruby><ruby>地<rt>ち</rt></ruby>。</p>
+      <p><ruby>目的<rt>もくてき</rt></ruby>がはっきりしていれば、<ruby>表示<rt>ひょうじ</rt></ruby>は<ruby>読<rt>よ</rt></ruby>みやすくなる。</p>
+      <p><ruby>企業<rt>きぎょう</rt></ruby>の<ruby>側<rt>がわ</rt></ruby>にも<ruby>責任<rt>せきにん</rt></ruby>がある。</p>
+      <p><ruby>小<rt>ちい</rt></ruby>さく<ruby>薄<rt>うす</rt></ruby>い<ruby>文字<rt>もじ</rt></ruby>で<ruby>重要<rt>じゅうよう</rt></ruby>な<ruby>注意<rt>ちゅうい</rt></ruby>を<ruby>隠<rt>かく</rt></ruby>すようなデザインは、<ruby>形式<rt>けいしき</rt></ruby><ruby>的<rt>てき</rt></ruby>には<ruby>書<rt>か</rt></ruby>いてあっても、<ruby>実質<rt>じっしつ</rt></ruby><ruby>的<rt>てき</rt></ruby>な<ruby>説明<rt>せつめい</rt></ruby>とは<ruby>言<rt>い</rt></ruby>いがたい。</p>
+      <p>わかりやすくすることは、<ruby>販売<rt>はんばい</rt></ruby>の<ruby>技術<rt>ぎじゅつ</rt></ruby>である<ruby>以上<rt>いじょう</rt></ruby>に、<ruby>信頼<rt>しんらい</rt></ruby>の<ruby>条件<rt>じょうけん</rt></ruby>である。</p>
+      <p><ruby>安<rt>やす</rt></ruby>さや<ruby>便利<rt>べんり</rt></ruby>さだけを<ruby>優先<rt>ゆうせん</rt></ruby>すると、<ruby>表示<rt>ひょうじ</rt></ruby>を<ruby>見<rt>み</rt></ruby>る<ruby>余裕<rt>よゆう</rt></ruby>は<ruby>失<rt>うしな</rt></ruby>われやすい。</p>
+      <p><ruby>急<rt>いそ</rt></ruby>いでいるときほど、<ruby>目立<rt>めだ</rt></ruby>つ<ruby>宣伝<rt>せんでん</rt></ruby><ruby>文句<rt>もんく</rt></ruby>に<ruby>目<rt>め</rt></ruby>が<ruby>行<rt>い</rt></ruby>く。</p>
+      <p>だからこそ、<ruby>普段<rt>ふだん</rt></ruby>から<ruby>比較<rt>ひかく</rt></ruby>の<ruby>軸<rt>じく</rt></ruby>を<ruby>決<rt>き</rt></ruby>めておくことが<ruby>防御<rt>ぼうぎょ</rt></ruby>になる。</p>
+      <p><ruby>毎回<rt>まいかい</rt></ruby><ruby>完璧<rt>かんぺき</rt></ruby>に<ruby>調<rt>しら</rt></ruby>べる<ruby>必要<rt>ひつよう</rt></ruby>はない。</p>
+      <p><ruby>疑<rt>うたが</rt></ruby>わしいとき、<ruby>立<rt>た</rt></ruby>ち<ruby>止<rt>ど</rt></ruby>まることができれば<ruby>十分<rt>じゅうぶん</rt></ruby>だ。</p>
+      <p><ruby>食<rt>た</rt></ruby>べることは<ruby>日常<rt>にちじょう</rt></ruby>の<ruby>行為<rt>こうい</rt></ruby>だが、その<ruby>選択<rt>せんたく</rt></ruby>の<ruby>積<rt>つ</rt></ruby>み<ruby>重<rt>かさ</rt></ruby>ねは<ruby>体<rt>からだ</rt></ruby>と<ruby>環境<rt>かんきょう</rt></ruby>に<ruby>残<rt>のこ</rt></ruby>る。</p>
+      <p><ruby>表示<rt>ひょうじ</rt></ruby>を<ruby>読<rt>よ</rt></ruby>むのは、<ruby>小<rt>ちい</rt></ruby>さな<ruby>確認<rt>かくにん</rt></ruby>にすぎない。</p>
+      <p>それでも、<ruby>自分<rt>じぶん</rt></ruby>の<ruby>選択<rt>せんたく</rt></ruby>に<ruby>説明<rt>せつめい</rt></ruby>を<ruby>与<rt>あた</rt></ruby>える<ruby>第一歩<rt>だいいっぽ</rt></ruby>になる。</p>
+    </div>
+
+    <div class="body-zh" lang="zh-CN">
+      <p>食品包装上排列着原材料、添加剂、产地、期限等许多信息。比以前更详细，这是确实的。可是文字量一增加，阅读的人有时反而抓不住要点。信息被公开，和被理解，并不是一回事。</p>
+      <p>消费者不必记住所有专门用语。但希望至少对自己重要的项目养成确认的习惯。过敏、盐分、原产地。目的一清楚，标识就会好读一些。企业一边也有责任。用又小又浅的字把重要注意事项藏起来的设计，形式上虽然写了，却很难说是实质性的说明。</p>
+      <p>写得明白，不只是销售技术，更是信任的条件。如果只优先便宜和方便，看标识的余地就容易失去。越是着急，眼睛越会走向显眼的宣传句。正因为如此，平时先定下比较的轴，才会成为防御。</p>
+      <p>不必每次都查得完美。在可疑的时候能够停住，就够了。吃是日常的行为，但那些选择的积累会留在身体和环境里。读标识不过是小小的确认。尽管如此，它会成为给自己的选择以说明的第一步。</p>
+    </div>
+
+    <p class="note">本文是学习用原创练习稿。等级为编辑估计，不是日语能力考试（JLPT）的官方认定。正文 496 个字符（汉字、假名、标点计入，空白不计入）。</p>
+    <nav class="nav">      <a href="../index.html">返回目录</a> · <a href="n2-08.html">上一篇</a> · <a href="n2-10.html">下一篇</a></nav>
+  </article>
+  <script src="../js/player.js"></script>
+</body>
+</html>

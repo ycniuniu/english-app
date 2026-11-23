@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>猫と夕方 · N5 · 日语阅读</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <article class="page">
+    <p class="column">日语阅读 · 每日一篇</p>
+    <div class="title-row">
+      <p class="level">N5</p>
+      <div class="titles">
+        <h1>猫と夕方</h1>
+        <p class="title-zh">猫和傍晚</p>
+      </div>
+      <div class="decor" aria-hidden="true"><svg class="decor-svg" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><ellipse cx="60" cy="70" rx="32" ry="24" fill="#C49A6C"/><circle cx="60" cy="46" r="22" fill="#C49A6C"/><polygon points="40,38 36,16 54,32" fill="#C49A6C"/><polygon points="80,38 84,16 66,32" fill="#C49A6C"/><circle cx="52" cy="46" r="3.2" fill="#3A4458"/><circle cx="68" cy="46" r="3.2" fill="#3A4458"/><ellipse cx="60" cy="56" rx="4" ry="3" fill="#F4B8C5"/><path d="M60 59 Q54 66 46 64" fill="none" stroke="#3A4458" stroke-width="2"/><path d="M60 59 Q66 66 74 64" fill="none" stroke="#3A4458" stroke-width="2"/><ellipse cx="92" cy="78" rx="10" ry="6" fill="#C49A6C"/></svg></div>
+    </div>
+
+    <div class="player" data-role="reader">
+      <button type="button" class="play" id="play">播放</button>
+      <button type="button" class="pause" id="pause">暂停/继续</button>
+      <button type="button" class="stop" id="stop">停止</button>
+      <label>语速
+        <select id="rate" aria-label="语速">
+          <option value="0.7">慢</option>
+          <option value="0.85">较慢</option>
+          <option value="1" selected>正常</option>
+          <option value="1.15">稍快</option>
+        </select>
+      </label>
+      <div class="voice-hint" id="voice-hint" hidden>
+        未检测到日语（ja-JP）语音。假名仍可正常显示，但朗读无法使用。可按下面的方法添加日语语音后，重新打开本页：
+        <br>iPhone / iPad：打开「设置」→「辅助功能」→「朗读内容」→「声音」，下载「日语」。也可在「设置」→「通用」→「语言与地区」中添加日语。
+        <br>Mac：打开「系统设置」→「辅助功能」→「朗读内容」（有的版本写作「口头内容」），在声音列表中下载日语；也可在「系统设置」→「通用」→「语言与地区」添加日语。
+        <br>Windows：打开「设置」→「时间和语言」→「语言和区域」，添加日语并下载语言包；再在「设置」→「时间和语言」→「语音」中确认已安装日语语音。然后重新打开本页。
+      </div>
+    </div>
+
+    <script type="application/json" id="speech-source">{"text": "私の家に白い猫がいます。名前はユキです。ユキは目が丸くて、しっぽが長いです。夕方、私は学校から帰ります。ユキはドアの前で待ちます。小さな声で「ニャー」と言います。私は「ただいま」と言って、手で頭をなでます。ユキはよろこびます。それから、小さな魚を食べます。水も飲みます。私は宿題をします。ユキは机の下で寝ます。七時に家族でばんごはんを食べます。ユキはとなりで見ています。でも、人の食べ物は食べません。食後、私はソファに座ります。ユキは私のとなりに来ます。いっしょにテレビを見ます。外はだんだん暗くなります。ユキの体はあたたかいです。夜、ユキは私の部屋で寝ます。毎日、ユキと会えるので、うれしいです。この時間がとても好きです。"}</script>
+
+    <div class="body-ja" lang="ja">
+      <p><ruby>私<rt>わたし</rt></ruby>の<ruby>家<rt>いえ</rt></ruby>に<ruby>白<rt>しろ</rt></ruby>い<ruby>猫<rt>ねこ</rt></ruby>がいます。</p>
+      <p><ruby>名前<rt>なまえ</rt></ruby>はユキです。</p>
+      <p>ユキは<ruby>目<rt>め</rt></ruby>が<ruby>丸<rt>まる</rt></ruby>くて、しっぽが<ruby>長<rt>なが</rt></ruby>いです。</p>
+      <p><ruby>夕方<rt>ゆうがた</rt></ruby>、<ruby>私<rt>わたし</rt></ruby>は<ruby>学校<rt>がっこう</rt></ruby>から<ruby>帰<rt>かえ</rt></ruby>ります。</p>
+      <p>ユキはドアの<ruby>前<rt>まえ</rt></ruby>で<ruby>待<rt>ま</rt></ruby>ちます。</p>
+      <p><ruby>小<rt>ちい</rt></ruby>さな<ruby>声<rt>こえ</rt></ruby>で「ニャー」と<ruby>言<rt>い</rt></ruby>います。</p>
+      <p><ruby>私<rt>わたし</rt></ruby>は「ただいま」と<ruby>言<rt>い</rt></ruby>って、<ruby>手<rt>て</rt></ruby>で<ruby>頭<rt>あたま</rt></ruby>をなでます。</p>
+      <p>ユキはよろこびます。</p>
+      <p>それから、<ruby>小<rt>ちい</rt></ruby>さな<ruby>魚<rt>さかな</rt></ruby>を<ruby>食<rt>た</rt></ruby>べます。</p>
+      <p><ruby>水<rt>みず</rt></ruby>も<ruby>飲<rt>の</rt></ruby>みます。</p>
+      <p><ruby>私<rt>わたし</rt></ruby>は<ruby>宿題<rt>しゅくだい</rt></ruby>をします。</p>
+      <p>ユキは<ruby>机<rt>つくえ</rt></ruby>の<ruby>下<rt>した</rt></ruby>で<ruby>寝<rt>ね</rt></ruby>ます。</p>
+      <p><ruby>七時<rt>しちじ</rt></ruby>に<ruby>家族<rt>かぞく</rt></ruby>でばんごはんを<ruby>食<rt>た</rt></ruby>べます。</p>
+      <p>ユキはとなりで<ruby>見<rt>み</rt></ruby>ています。</p>
+      <p>でも、<ruby>人<rt>ひと</rt></ruby>の<ruby>食<rt>た</rt></ruby>べ<ruby>物<rt>もの</rt></ruby>は<ruby>食<rt>た</rt></ruby>べません。</p>
+      <p><ruby>食後<rt>しょくご</rt></ruby>、<ruby>私<rt>わたし</rt></ruby>はソファに<ruby>座<rt>すわ</rt></ruby>ります。</p>
+      <p>ユキは<ruby>私<rt>わたし</rt></ruby>のとなりに<ruby>来<rt>き</rt></ruby>ます。</p>
+      <p>いっしょにテレビを<ruby>見<rt>み</rt></ruby>ます。</p>
+      <p><ruby>外<rt>そと</rt></ruby>はだんだん<ruby>暗<rt>くら</rt></ruby>くなります。</p>
+      <p>ユキの<ruby>体<rt>からだ</rt></ruby>はあたたかいです。</p>
+      <p><ruby>夜<rt>よる</rt></ruby>、ユキは<ruby>私<rt>わたし</rt></ruby>の<ruby>部屋<rt>へや</rt></ruby>で<ruby>寝<rt>ね</rt></ruby>ます。</p>
+      <p><ruby>毎日<rt>まいにち</rt></ruby>、ユキと<ruby>会<rt>あ</rt></ruby>えるので、うれしいです。</p>
+      <p>この<ruby>時間<rt>じかん</rt></ruby>がとても<ruby>好<rt>す</rt></ruby>きです。</p>
+    </div>
+
+    <div class="body-zh" lang="zh-CN">
+      <p>我家有一只白猫，名字叫小雪。小雪眼睛圆圆的，尾巴很长。傍晚，我从学校回来。小雪在门前等着，轻轻地叫「喵」。我说「我回来了」，用手摸摸它的头。</p>
+      <p>小雪很高兴。然后它吃小鱼，也喝水。我做作业，小雪就在桌子下面睡觉。七点，全家人吃晚饭。小雪在旁边看着，但不吃人的食物。吃完后，我坐在沙发上。</p>
+      <p>小雪来到我身边。我们一起看电视。外面渐渐暗了。小雪的身体暖暖的。晚上，小雪在我的房间里睡。每天都能见到小雪，我很开心。我非常喜欢这段时光。</p>
+    </div>
+
+    <p class="note">本文是学习用原创练习稿。等级为编辑估计，不是日语能力考试（JLPT）的官方认定。正文 312 个字符（汉字、假名、标点计入，空白不计入）。</p>
+    <nav class="nav">      <a href="../index.html">返回目录</a> · <a href="n5-07.html">上一篇</a> · <a href="n5-09.html">下一篇</a></nav>
+  </article>
+  <script src="../js/player.js"></script>
+</body>
+</html>
