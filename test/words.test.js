@@ -53,9 +53,13 @@ test('every card has forms, several senses, examples, and phrases', () => {
   assert.ok(make.forms.some((line) => line.includes('make / made / made / making')))
   assert.deepEqual(wordPosLabels(make.senses), ['动词'])
   const makeForms = describeForms(make.forms, make.senses, 'make')
-  assert.ok(makeForms.some((item) => item.label === '过去式（动词）' && item.word === 'made'))
-  assert.ok(makeForms.some((item) => item.label === '过去分词（动词）' && item.word === 'made'))
-  assert.ok(makeForms.some((item) => item.label === '现在分词（动词）' && item.word === 'making'))
+  assert.ok(makeForms.some((item) => item.label === 'past' && item.word === 'made'))
+  assert.ok(makeForms.some((item) => item.label === 'past participle' && item.word === 'made'))
+  assert.ok(makeForms.some((item) => item.label === '-ing' && item.word === 'making'))
+  for (const item of makeForms) {
+    assert.ok(item.examples?.length >= 1)
+    assert.equal(item.examples[0][0].toLowerCase().includes(item.word), true)
+  }
   const glosses = make.senses.map((sense) => sense.zh)
   for (const gloss of ['制造', '使得', '做决定', '赚取']) {
     assert.ok(glosses.includes(gloss))
@@ -93,4 +97,56 @@ test('every card has forms, several senses, examples, and phrases', () => {
       assert.ok(CJK_RE.test(pair[1]))
     }
   }
+})
+
+function containsForm(sentence, form) {
+  const text = String(sentence || '').toLowerCase()
+  const needle = String(form || '').toLowerCase()
+  let from = 0
+  while (from <= text.length) {
+    const at = text.indexOf(needle, from)
+    if (at < 0) return false
+    const before = at === 0 ? '' : text[at - 1]
+    const after = text[at + needle.length] || ''
+    const edge = (char) => !char || !/[a-z]/i.test(char)
+    if (edge(before) && edge(after)) return true
+    from = at + 1
+  }
+  return false
+}
+
+test('every existing English verb form has an English label and a matching example', () => {
+  const verbLabels = new Set(['base', 'past', 'past participle', '-ing'])
+  const counts = { base: 0, past: 0, 'past participle': 0, '-ing': 0 }
+  let verbHeads = 0
+  for (let id = 0; id < details.length; id++) {
+    const detail = details[id]
+    const items = describeForms(detail.forms, detail.senses, words[id][0])
+    const verbItems = items.filter((item) => verbLabels.has(item.label))
+    if (!verbItems.length) continue
+    verbHeads += 1
+    for (const item of verbItems) {
+      counts[item.label] += 1
+      assert.equal(/[\u4e00-\u9fff]/.test(item.label), false)
+      assert.ok(item.examples?.length >= 1 && item.examples.length <= 2)
+      assert.equal(
+        containsForm(item.examples[0][0], item.word),
+        true,
+        `${words[id][0]} ${item.label} ${item.word} :: ${item.examples[0][0]}`,
+      )
+      assert.ok(item.examples[0][1].length > 0)
+    }
+    for (const item of items) {
+      if (verbLabels.has(item.label)) continue
+      assert.equal(item.examples, undefined)
+      assert.match(item.label, /[\u4e00-\u9fff]/)
+    }
+  }
+  assert.equal(verbHeads, 3866)
+  assert.deepEqual(counts, {
+    base: 3866,
+    past: 3849,
+    'past participle': 3838,
+    '-ing': 3800,
+  })
 })

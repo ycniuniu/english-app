@@ -100,6 +100,18 @@ const WordFacts = memo(function WordFacts({ detail, reveal, rate, speakId, headw
                     {item.word}
                   </span>
                 ) : null}
+                {item.examples?.length ? (
+                  <div className="form-examples">
+                    {item.examples.map(([en, zh]) => (
+                      <p key={en} className="form-example">
+                        <span className="form-example-en" lang="en">
+                          {en}
+                        </span>
+                        {zh ? <span className="form-example-zh">{zh}</span> : null}
+                      </p>
+                    ))}
+                  </div>
+                ) : null}
               </li>
             ))}
           </ul>
