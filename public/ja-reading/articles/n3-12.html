@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>画面を見る時間 · N3 · 日语阅读</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <article class="page">
+    <p class="column">日语阅读 · 每日一篇</p>
+    <div class="title-row">
+      <p class="level">N3</p>
+      <div class="titles">
+        <h1>画面を見る時間</h1>
+        <p class="title-zh">看屏幕的时间</p>
+      </div>
+      <div class="decor" aria-hidden="true"><svg class="decor-svg" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><path d="M30 58 L90 58 L78 28 L42 28 Z" fill="#F0C45A"/><rect x="56" y="58" width="8" height="28" fill="#3A4458"/><ellipse cx="60" cy="92" rx="22" ry="6" fill="#7EA4D8"/><circle cx="60" cy="22" r="5" fill="#E0A83C"/></svg></div>
+    </div>
+
+    <div class="player" data-role="reader">
+      <button type="button" class="play" id="play">播放</button>
+      <button type="button" class="pause" id="pause">暂停/继续</button>
+      <button type="button" class="stop" id="stop">停止</button>
+      <label>语速
+        <select id="rate" aria-label="语速">
+          <option value="0.7">慢</option>
+          <option value="0.85">较慢</option>
+          <option value="1" selected>正常</option>
+          <option value="1.15">稍快</option>
+        </select>
+      </label>
+      <div class="voice-hint" id="voice-hint" hidden>
+        未检测到日语（ja-JP）语音。假名仍可正常显示，但朗读无法使用。可按下面的方法添加日语语音后，重新打开本页：
+        <br>iPhone / iPad：打开「设置」→「辅助功能」→「朗读内容」→「声音」，下载「日语」。也可在「设置」→「通用」→「语言与地区」中添加日语。
+        <br>Mac：打开「系统设置」→「辅助功能」→「朗读内容」（有的版本写作「口头内容」），在声音列表中下载日语；也可在「系统设置」→「通用」→「语言与地区」添加日语。
+        <br>Windows：打开「设置」→「时间和语言」→「语言和区域」，添加日语并下载语言包；再在「设置」→「时间和语言」→「语音」中确认已安装日语语音。然后重新打开本页。
+      </div>
+    </div>
+
+    <script type="application/json" id="speech-source">{"text": "寝る前に電話を見ていると、気づかないうちに一時間が過ぎていることがあります。面白い記事や短い動画が次々に出てくるので、終わりの合図がありません。翌朝、目が覚めても頭がすっきりしない日は、だいたいそのせいだと感じています。完全にやめるのは難しいです。連絡を待つこともあるし、調べ物に必要なこともあります。だから私は、夜十時を過ぎたら、電話をリビングの充電器に置くことにしました。最初の三日は、枕のそばに何もないことが不安でした。手があいて、何かを見たくなります。その時は紙の本を一冊だけベッドの近くに置くようにしました。ページを閉じやすいものがいいです。一週間たつと、眠るまでの時間が短くなりました。もちろん、毎日うまくいくわけではありません。どうしても確認したいことがある日は、例外にしています。例外が続くと意味がなくなるので、週に一度まで、と決めています。画面は悪いものではありません。使い方の境界が見えないことが問題なのです。自分で線を引かないと、機械は止めてくれません。時間が戻ってくるわけではありませんが、朝の気分は確実に違います。小さな約束でも、守れる形にしておくことが大事だと思います。"}</script>
+
+    <div class="body-ja" lang="ja">
+      <p><ruby>寝<rt>ね</rt></ruby>る<ruby>前<rt>まえ</rt></ruby>に<ruby>電話<rt>でんわ</rt></ruby>を<ruby>見<rt>み</rt></ruby>ていると、<ruby>気<rt>き</rt></ruby>づかないうちに<ruby>一時間<rt>いちじかん</rt></ruby>が<ruby>過<rt>す</rt></ruby>ぎていることがあります。</p>
+      <p><ruby>面白<rt>おもしろ</rt></ruby>い<ruby>記事<rt>きじ</rt></ruby>や<ruby>短<rt>みじか</rt></ruby>い<ruby>動画<rt>どうが</rt></ruby>が<ruby>次々<rt>つぎつぎ</rt></ruby>に<ruby>出<rt>で</rt></ruby>てくるので、<ruby>終<rt>お</rt></ruby>わりの<ruby>合図<rt>あいず</rt></ruby>がありません。</p>
+      <p><ruby>翌朝<rt>よくあさ</rt></ruby>、<ruby>目<rt>め</rt></ruby>が<ruby>覚<rt>さ</rt></ruby>めても<ruby>頭<rt>あたま</rt></ruby>がすっきりしない<ruby>日<rt>ひ</rt></ruby>は、だいたいそのせいだと<ruby>感<rt>かん</rt></ruby>じています。</p>
+      <p><ruby>完全<rt>かんぜん</rt></ruby>にやめるのは<ruby>難<rt>むずか</rt></ruby>しいです。</p>
+      <p><ruby>連絡<rt>れんらく</rt></ruby>を<ruby>待<rt>ま</rt></ruby>つこともあるし、<ruby>調<rt>しら</rt></ruby>べ<ruby>物<rt>もの</rt></ruby>に<ruby>必要<rt>ひつよう</rt></ruby>なこともあります。</p>
+      <p>だから<ruby>私<rt>わたし</rt></ruby>は、<ruby>夜<rt>よる</rt></ruby><ruby>十時<rt>じゅうじ</rt></ruby>を<ruby>過<rt>す</rt></ruby>ぎたら、<ruby>電話<rt>でんわ</rt></ruby>をリビングの<ruby>充電<rt>じゅうでん</rt></ruby><ruby>器<rt>き</rt></ruby>に<ruby>置<rt>お</rt></ruby>くことにしました。</p>
+      <p><ruby>最初<rt>さいしょ</rt></ruby>の<ruby>三日<rt>みっか</rt></ruby>は、<ruby>枕<rt>まくら</rt></ruby>のそばに<ruby>何<rt>なん</rt></ruby>もないことが<ruby>不安<rt>ふあん</rt></ruby>でした。</p>
+      <p><ruby>手<rt>て</rt></ruby>があいて、<ruby>何<rt>なん</rt></ruby>かを<ruby>見<rt>み</rt></ruby>たくなります。</p>
+      <p>その<ruby>時<rt>とき</rt></ruby>は<ruby>紙<rt>かみ</rt></ruby>の<ruby>本<rt>ほん</rt></ruby>を<ruby>一冊<rt>いっさつ</rt></ruby>だけベッドの<ruby>近<rt>ちか</rt></ruby>くに<ruby>置<rt>お</rt></ruby>くようにしました。</p>
+      <p>ページを<ruby>閉<rt>と</rt></ruby>じやすいものがいいです。</p>
+      <p><ruby>一週間<rt>いっしゅうかん</rt></ruby>たつと、<ruby>眠<rt>ねむ</rt></ruby>るまでの<ruby>時間<rt>じかん</rt></ruby>が<ruby>短<rt>みじか</rt></ruby>くなりました。</p>
+      <p>もちろん、<ruby>毎日<rt>まいにち</rt></ruby>うまくいくわけではありません。</p>
+      <p>どうしても<ruby>確認<rt>かくにん</rt></ruby>したいことがある<ruby>日<rt>ひ</rt></ruby>は、<ruby>例外<rt>れいがい</rt></ruby>にしています。</p>
+      <p><ruby>例外<rt>れいがい</rt></ruby>が<ruby>続<rt>つづ</rt></ruby>くと<ruby>意味<rt>いみ</rt></ruby>がなくなるので、<ruby>週<rt>しゅう</rt></ruby>に<ruby>一度<rt>いちど</rt></ruby>まで、と<ruby>決<rt>き</rt></ruby>めています。</p>
+      <p><ruby>画面<rt>がめん</rt></ruby>は<ruby>悪<rt>わる</rt></ruby>いものではありません。</p>
+      <p><ruby>使<rt>つか</rt></ruby>い<ruby>方<rt>かた</rt></ruby>の<ruby>境界<rt>きょうかい</rt></ruby>が<ruby>見<rt>み</rt></ruby>えないことが<ruby>問題<rt>もんだい</rt></ruby>なのです。</p>
+      <p><ruby>自分<rt>じぶん</rt></ruby>で<ruby>線<rt>せん</rt></ruby>を<ruby>引<rt>ひ</rt></ruby>かないと、<ruby>機械<rt>きかい</rt></ruby>は<ruby>止<rt>と</rt></ruby>めてくれません。</p>
+      <p><ruby>時間<rt>じかん</rt></ruby>が<ruby>戻<rt>もど</rt></ruby>ってくるわけではありませんが、<ruby>朝<rt>あさ</rt></ruby>の<ruby>気分<rt>きぶん</rt></ruby>は<ruby>確実<rt>かくじつ</rt></ruby>に<ruby>違<rt>ちが</rt></ruby>います。</p>
+      <p><ruby>小<rt>ちい</rt></ruby>さな<ruby>約束<rt>やくそく</rt></ruby>でも、<ruby>守<rt>まも</rt></ruby>れる<ruby>形<rt>かたち</rt></ruby>にしておくことが<ruby>大事<rt>だいじ</rt></ruby>だと<ruby>思<rt>おも</rt></ruby>います。</p>
+    </div>
+
+    <div class="body-zh" lang="zh-CN">
+      <p>睡前一看电话，常常不知不觉就过了一个小时。有趣的文章和短视频会接连出现，没有结束的信号。第二天早上醒来头脑仍不清爽的日子，我大致觉得都是因为这个。</p>
+      <p>完全戒掉很难。有时要等联络，有时查东西也需要。所以我规定，过了晚上十点，就把电话放在起居室的充电器上。开头三天，枕头边什么都没有，会感到不安。</p>
+      <p>手空着，就想看点什么。于是我只在床边放一本纸质书。最好是容易合上的那种。过了一周，入睡所需的时间变短了。当然，不是每天都顺利。实在有事要确认的日子，就当作例外。</p>
+      <p>例外一持续就没有意义，所以我规定最多一周一次。屏幕并不是坏东西。问题在于使用的边界看不见。自己不划下一条线，机器是不会帮你停的。时间并不会回来，但早上的心情确实不同。</p>
+      <p>即使是小小的约定，做成能够遵守的形状，我觉得也很重要。</p>
+    </div>
+
+    <p class="note">本文是学习用原创练习稿。等级为编辑估计，不是日语能力考试（JLPT）的官方认定。正文 499 个字符（汉字、假名、标点计入，空白不计入）。</p>
+    <nav class="nav">      <a href="../index.html">返回目录</a> · <a href="n3-11.html">上一篇</a> · <a href="n3-13.html">下一篇</a></nav>
+  </article>
+  <script src="../js/player.js"></script>
+</body>
+</html>

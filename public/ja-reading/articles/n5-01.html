@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>朝の準備 · N5 · 日语阅读</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <article class="page">
+    <p class="column">日语阅读 · 每日一篇</p>
+    <div class="title-row">
+      <p class="level">N5</p>
+      <div class="titles">
+        <h1>朝の準備</h1>
+        <p class="title-zh">早上的准备</p>
+      </div>
+      <div class="decor" aria-hidden="true"><svg class="decor-svg" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><circle cx="60" cy="60" r="26" fill="#F0C45A"/><circle cx="52" cy="52" r="8" fill="#FFE7A8" opacity="0.8"/><rect x="58" y="8" width="4" height="16" rx="2" fill="#E0A83C" transform="rotate(0 60 60)"/><rect x="58" y="8" width="4" height="16" rx="2" fill="#E0A83C" transform="rotate(45 60 60)"/><rect x="58" y="8" width="4" height="16" rx="2" fill="#E0A83C" transform="rotate(90 60 60)"/><rect x="58" y="8" width="4" height="16" rx="2" fill="#E0A83C" transform="rotate(135 60 60)"/><rect x="58" y="8" width="4" height="16" rx="2" fill="#E0A83C" transform="rotate(180 60 60)"/><rect x="58" y="8" width="4" height="16" rx="2" fill="#E0A83C" transform="rotate(225 60 60)"/><rect x="58" y="8" width="4" height="16" rx="2" fill="#E0A83C" transform="rotate(270 60 60)"/><rect x="58" y="8" width="4" height="16" rx="2" fill="#E0A83C" transform="rotate(315 60 60)"/></svg></div>
+    </div>
+
+    <div class="player" data-role="reader">
+      <button type="button" class="play" id="play">播放</button>
+      <button type="button" class="pause" id="pause">暂停/继续</button>
+      <button type="button" class="stop" id="stop">停止</button>
+      <label>语速
+        <select id="rate" aria-label="语速">
+          <option value="0.7">慢</option>
+          <option value="0.85">较慢</option>
+          <option value="1" selected>正常</option>
+          <option value="1.15">稍快</option>
+        </select>
+      </label>
+      <div class="voice-hint" id="voice-hint" hidden>
+        未检测到日语（ja-JP）语音。假名仍可正常显示，但朗读无法使用。可按下面的方法添加日语语音后，重新打开本页：
+        <br>iPhone / iPad：打开「设置」→「辅助功能」→「朗读内容」→「声音」，下载「日语」。也可在「设置」→「通用」→「语言与地区」中添加日语。
+        <br>Mac：打开「系统设置」→「辅助功能」→「朗读内容」（有的版本写作「口头内容」），在声音列表中下载日语；也可在「系统设置」→「通用」→「语言与地区」添加日语。
+        <br>Windows：打开「设置」→「时间和语言」→「语言和区域」，添加日语并下载语言包；再在「设置」→「时间和语言」→「语音」中确认已安装日语语音。然后重新打开本页。
+      </div>
+    </div>
+
+    <script type="application/json" id="speech-source">{"text": "今日は六時に起きました。窓を開けて、外を見ます。空はもう明るいです。鳥が木の上にいます。私は顔を洗います。それから歯をみがきます。きれいなシャツを着ます。キッチンへ行きます。テーブルの上にパンとミルクがあります。母が「おはよう」と言います。私も「おはよう」と言います。朝ごはんをゆっくり食べます。パンはあたたかくて、とてもおいしいです。かばんの中を見ます。本とノートとペンがあります。靴をはいて、七時に家を出ます。学校は家から近いです。歩いて十五分です。道で友だちの山下さんに会います。いっしょに学校へ行きます。私は毎日このじゅんびをします。朝の時間が好きです。外の空気もきれいです。今日もいい一日にしたいです。"}</script>
+
+    <div class="body-ja" lang="ja">
+      <p><ruby>今日<rt>きょう</rt></ruby>は<ruby>六時<rt>ろくじ</rt></ruby>に<ruby>起<rt>お</rt></ruby>きました。</p>
+      <p><ruby>窓<rt>まど</rt></ruby>を<ruby>開<rt>あ</rt></ruby>けて、<ruby>外<rt>そと</rt></ruby>を<ruby>見<rt>み</rt></ruby>ます。</p>
+      <p><ruby>空<rt>そら</rt></ruby>はもう<ruby>明<rt>あか</rt></ruby>るいです。</p>
+      <p><ruby>鳥<rt>とり</rt></ruby>が<ruby>木<rt>き</rt></ruby>の<ruby>上<rt>うえ</rt></ruby>にいます。</p>
+      <p><ruby>私<rt>わたし</rt></ruby>は<ruby>顔<rt>かお</rt></ruby>を<ruby>洗<rt>あら</rt></ruby>います。</p>
+      <p>それから<ruby>歯<rt>は</rt></ruby>をみがきます。</p>
+      <p>きれいなシャツを<ruby>着<rt>き</rt></ruby>ます。</p>
+      <p>キッチンへ<ruby>行<rt>い</rt></ruby>きます。</p>
+      <p>テーブルの<ruby>上<rt>うえ</rt></ruby>にパンとミルクがあります。</p>
+      <p><ruby>母<rt>はは</rt></ruby>が「おはよう」と<ruby>言<rt>い</rt></ruby>います。</p>
+      <p><ruby>私<rt>わたし</rt></ruby>も「おはよう」と<ruby>言<rt>い</rt></ruby>います。</p>
+      <p><ruby>朝<rt>あさ</rt></ruby>ごはんをゆっくり<ruby>食<rt>た</rt></ruby>べます。</p>
+      <p>パンはあたたかくて、とてもおいしいです。</p>
+      <p>かばんの<ruby>中<rt>なか</rt></ruby>を<ruby>見<rt>み</rt></ruby>ます。</p>
+      <p><ruby>本<rt>ほん</rt></ruby>とノートとペンがあります。</p>
+      <p><ruby>靴<rt>くつ</rt></ruby>をはいて、<ruby>七時<rt>しちじ</rt></ruby>に<ruby>家<rt>いえ</rt></ruby>を<ruby>出<rt>で</rt></ruby>ます。</p>
+      <p><ruby>学校<rt>がっこう</rt></ruby>は<ruby>家<rt>いえ</rt></ruby>から<ruby>近<rt>ちか</rt></ruby>いです。</p>
+      <p><ruby>歩<rt>ある</rt></ruby>いて<ruby>十五分<rt>じゅうごふん</rt></ruby>です。</p>
+      <p><ruby>道<rt>みち</rt></ruby>で<ruby>友だち<rt>ともだち</rt></ruby>の<ruby>山下<rt>やました</rt></ruby>さんに<ruby>会<rt>あ</rt></ruby>います。</p>
+      <p>いっしょに<ruby>学校<rt>がっこう</rt></ruby>へ<ruby>行<rt>い</rt></ruby>きます。</p>
+      <p><ruby>私<rt>わたし</rt></ruby>は<ruby>毎日<rt>まいにち</rt></ruby>このじゅんびをします。</p>
+      <p><ruby>朝<rt>あさ</rt></ruby>の<ruby>時間<rt>じかん</rt></ruby>が<ruby>好<rt>す</rt></ruby>きです。</p>
+      <p><ruby>外<rt>そと</rt></ruby>の<ruby>空気<rt>くうき</rt></ruby>もきれいです。</p>
+      <p><ruby>今日<rt>きょう</rt></ruby>もいい<ruby>一日<rt>いちにち</rt></ruby>にしたいです。</p>
+    </div>
+
+    <div class="body-zh" lang="zh-CN">
+      <p>今天我六点起了床。打开窗户，看着外面。天空已经亮了。树上有鸟。我洗脸，然后刷牙，穿上干净的衬衫。我走向厨房。桌上有面包和牛奶。妈妈说「早上好」。</p>
+      <p>我也说「早上好」。我慢慢地吃早餐。面包热乎乎的，非常好吃。我看了看包里，有书、笔记本和笔。我穿上鞋，七点出门。学校离家很近，走着去要十五分钟。</p>
+      <p>在路上遇见了朋友山下。我们一起去学校。我每天都做这些准备。我喜欢早晨的时光。今天也想过美好的一天。</p>
+    </div>
+
+    <p class="note">本文是学习用原创练习稿。等级为编辑估计，不是日语能力考试（JLPT）的官方认定。正文 306 个字符（汉字、假名、标点计入，空白不计入）。</p>
+    <nav class="nav">      <a href="../index.html">返回目录</a> · <a href="n5-02.html">下一篇</a></nav>
+  </article>
+  <script src="../js/player.js"></script>
+</body>
+</html>

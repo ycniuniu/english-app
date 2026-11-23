@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>新しいノート · N5 · 日语阅读</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <article class="page">
+    <p class="column">日语阅读 · 每日一篇</p>
+    <div class="title-row">
+      <p class="level">N5</p>
+      <div class="titles">
+        <h1>新しいノート</h1>
+        <p class="title-zh">新笔记本</p>
+      </div>
+      <div class="decor" aria-hidden="true"><svg class="decor-svg" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><rect x="30" y="18" width="60" height="84" rx="6" fill="#7EA4D8" stroke="#3A4458" stroke-width="1.5"/><rect x="36" y="26" width="48" height="68" rx="2" fill="#FFFDF8"/><line x1="44" y1="40" x2="76" y2="40" stroke="#5B86C6" stroke-width="2"/><line x1="44" y1="52" x2="76" y2="52" stroke="#D5DBE8" stroke-width="2"/><line x1="44" y1="64" x2="70" y2="64" stroke="#D5DBE8" stroke-width="2"/><circle cx="24" cy="40" r="4" fill="#F0C45A"/><circle cx="24" cy="60" r="4" fill="#F0C45A"/><circle cx="24" cy="80" r="4" fill="#F0C45A"/></svg></div>
+    </div>
+
+    <div class="player" data-role="reader">
+      <button type="button" class="play" id="play">播放</button>
+      <button type="button" class="pause" id="pause">暂停/继续</button>
+      <button type="button" class="stop" id="stop">停止</button>
+      <label>语速
+        <select id="rate" aria-label="语速">
+          <option value="0.7">慢</option>
+          <option value="0.85">较慢</option>
+          <option value="1" selected>正常</option>
+          <option value="1.15">稍快</option>
+        </select>
+      </label>
+      <div class="voice-hint" id="voice-hint" hidden>
+        未检测到日语（ja-JP）语音。假名仍可正常显示，但朗读无法使用。可按下面的方法添加日语语音后，重新打开本页：
+        <br>iPhone / iPad：打开「设置」→「辅助功能」→「朗读内容」→「声音」，下载「日语」。也可在「设置」→「通用」→「语言与地区」中添加日语。
+        <br>Mac：打开「系统设置」→「辅助功能」→「朗读内容」（有的版本写作「口头内容」），在声音列表中下载日语；也可在「系统设置」→「通用」→「语言与地区」添加日语。
+        <br>Windows：打开「设置」→「时间和语言」→「语言和区域」，添加日语并下载语言包；再在「设置」→「时间和语言」→「语音」中确认已安装日语语音。然后重新打开本页。
+      </div>
+    </div>
+
+    <script type="application/json" id="speech-source">{"text": "昨日、私は新しいノートを買いました。表紙は青いです。白い山の絵があります。とてもきれいです。今日、日本語のクラスでそのノートを使います。先生がことばを言います。私はゆっくり書きます。漢字は少しむずかしいです。でも、何度も書きます。友だちが「きれいな字ですね」と言います。私は「ありがとう」と言います。ノートの一ページ目に五月十日と書きます。家へ帰って、もう一度見ます。赤いペンできれいなことばを書きます。このノートは百ページあります。毎日少し使いたいです。ページがなくなったら、また新しいノートを買います。私は書くことが好きです。ノートを見ると、勉強したことばがわかります。来週のテストの前にも、このノートを見ます。"}</script>
+
+    <div class="body-ja" lang="ja">
+      <p><ruby>昨日<rt>きのう</rt></ruby>、<ruby>私<rt>わたし</rt></ruby>は<ruby>新<rt>あたら</rt></ruby>しいノートを<ruby>買<rt>か</rt></ruby>いました。</p>
+      <p><ruby>表紙<rt>ひょうし</rt></ruby>は<ruby>青<rt>あお</rt></ruby>いです。</p>
+      <p><ruby>白<rt>しろ</rt></ruby>い<ruby>山<rt>やま</rt></ruby>の<ruby>絵<rt>え</rt></ruby>があります。</p>
+      <p>とてもきれいです。</p>
+      <p><ruby>今日<rt>きょう</rt></ruby>、<ruby>日本語<rt>にほんご</rt></ruby>のクラスでそのノートを<ruby>使<rt>つか</rt></ruby>います。</p>
+      <p><ruby>先生<rt>せんせい</rt></ruby>がことばを<ruby>言<rt>い</rt></ruby>います。</p>
+      <p><ruby>私<rt>わたし</rt></ruby>はゆっくり<ruby>書<rt>か</rt></ruby>きます。</p>
+      <p><ruby>漢字<rt>かんじ</rt></ruby>は<ruby>少<rt>すこ</rt></ruby>しむずかしいです。</p>
+      <p>でも、<ruby>何度<rt>なんど</rt></ruby>も<ruby>書<rt>か</rt></ruby>きます。</p>
+      <p><ruby>友だち<rt>ともだち</rt></ruby>が「きれいな<ruby>字<rt>じ</rt></ruby>ですね」と<ruby>言<rt>い</rt></ruby>います。</p>
+      <p><ruby>私<rt>わたし</rt></ruby>は「ありがとう」と<ruby>言<rt>い</rt></ruby>います。</p>
+      <p>ノートの<ruby>一ページ目<rt>いちページめ</rt></ruby>に<ruby>五月<rt>ごがつ</rt></ruby><ruby>十日<rt>とおか</rt></ruby>と<ruby>書<rt>か</rt></ruby>きます。</p>
+      <p><ruby>家<rt>いえ</rt></ruby>へ<ruby>帰<rt>かえ</rt></ruby>って、もう<ruby>一度<rt>いちど</rt></ruby><ruby>見<rt>み</rt></ruby>ます。</p>
+      <p><ruby>赤<rt>あか</rt></ruby>いペンできれいなことばを<ruby>書<rt>か</rt></ruby>きます。</p>
+      <p>このノートは<ruby>百ページ<rt>ひゃくページ</rt></ruby>あります。</p>
+      <p><ruby>毎日<rt>まいにち</rt></ruby><ruby>少<rt>すこ</rt></ruby>し<ruby>使<rt>つか</rt></ruby>いたいです。</p>
+      <p>ページがなくなったら、また<ruby>新<rt>あたら</rt></ruby>しいノートを<ruby>買<rt>か</rt></ruby>います。</p>
+      <p><ruby>私<rt>わたし</rt></ruby>は<ruby>書<rt>か</rt></ruby>くことが<ruby>好<rt>す</rt></ruby>きです。</p>
+      <p>ノートを<ruby>見<rt>み</rt></ruby>ると、<ruby>勉強<rt>べんきょう</rt></ruby>したことばがわかります。</p>
+      <p><ruby>来週<rt>らいしゅう</rt></ruby>のテストの<ruby>前<rt>まえ</rt></ruby>にも、このノートを<ruby>見<rt>み</rt></ruby>ます。</p>
+    </div>
+
+    <div class="body-zh" lang="zh-CN">
+      <p>昨天，我买了一本新笔记本。封面是蓝色的，上面有白色的山。非常漂亮。今天，我在日语课上用了那本笔记本。老师说出词语。我慢慢地写。汉字有一点难，但我写了很多遍。</p>
+      <p>朋友说「字写得真好看」。我说「谢谢」。我在笔记本的第一页写上五月十日。回到家后再看一遍。我用红笔写下好看的词语。这本笔记本有一百页。我想每天都用一点。</p>
+      <p>页用完了，就再买一本新的。我喜欢写字。一看笔记本，就能明白学过的词语。下星期考试前，我也会看这本笔记本。</p>
+    </div>
+
+    <p class="note">本文是学习用原创练习稿。等级为编辑估计，不是日语能力考试（JLPT）的官方认定。正文 308 个字符（汉字、假名、标点计入，空白不计入）。</p>
+    <nav class="nav">      <a href="../index.html">返回目录</a> · <a href="n5-06.html">上一篇</a> · <a href="n5-08.html">下一篇</a></nav>
+  </article>
+  <script src="../js/player.js"></script>
+</body>
+</html>
