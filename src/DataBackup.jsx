@@ -80,14 +80,21 @@ export function DataBackup({ onClose }) {
     }
     setUndoReady(readStorageEntry(SNAPSHOT_KEY).status === 'ok')
     setParsed(null)
-    setMessage(result.changed ? `已写入 ${result.changed} 项。可以撤销刚才这一次。已有词条在合并时不会被换成备份里的复习日。` : '没有需要写入的新内容。本机记录保持原样。')
+    if (result.changed) {
+      window.location.reload()
+      return
+    }
+    setMessage('没有需要写入的新内容。本机记录保持原样。')
   }
 
   function undo() {
     const storage = browserStorage()
     const result = undoLastImport(storage.getItem, storage.setItem, storage.removeItem)
-    setMessage(result.ok ? '已撤销刚才的导入，恢复到导入前的原文。' : result.error)
-    if (result.ok) setUndoReady(false)
+    if (!result.ok) {
+      setMessage(result.error)
+      return
+    }
+    window.location.reload()
   }
 
   return (
@@ -100,7 +107,7 @@ export function DataBackup({ onClose }) {
       </div>
       <div className="backup-body">
         <p className="lead">
-          这里导出的是 localStorage。英语单词、日语单词、翻译草稿、语速、上次打开的页，以及内置刷题和语法，都在里面。不会清空记录。个人官方资料在另一个本地数据库里，这份备份不含原卷、音频和那份进度。
+          这里导出的是 localStorage。英语单词、日语单词、阅读进度、翻译草稿、语速、上次打开的页，以及内置刷题和语法，都在里面。不会清空记录。写入之后页面会重新打开，免得正在看的内容把刚导入的进度盖掉。个人官方资料在另一个本地数据库里，这份备份不含原卷、音频和那份进度。
         </p>
         <p className="meta">
           预览网址和 english-app-woad-ten.vercel.app 不是同一个网站，打不开彼此的本地记录。请在平时背单词的那个入口里导出：Safari 里打开的，就在 Safari 导出；主屏幕图标里用的，就在那个图标里导出。不要删除图标，也不要清除网站数据。

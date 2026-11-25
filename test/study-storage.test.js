@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { applyBackup, buildBackup, parseBackupText, undoLastImport } from '../src/backup.js'
+import { applyBackup, buildBackup, describeBackup, parseBackupText, undoLastImport } from '../src/backup.js'
 import { dueGrammarIds, loadGrammar, readGrammarStore, recordExercise, setLearned, toggleGrammarFavorite } from '../src/grammar-progress.js'
 import { answerQuestion, loadQuiz, questionsFor, readQuizStore, shuffleIds, summarizeQuestions, toggleFavorite, wrongIds } from '../src/quiz-progress.js'
 import { GRAMMAR_KEY, JA_WORD_KEY, QUIZ_KEY, READING_PROGRESS_KEY, SNAPSHOT_KEY, WORD_KEY } from '../src/storage-keys.js'
@@ -228,6 +228,8 @@ test('reading progress roundtrip keeps old word cards', () => {
   const articles = JSON.parse(keep.data[READING_PROGRESS_KEY]).articles
   assert.equal(articles['n5-01'].read, true)
   assert.equal(articles['n4-05'].read, false)
+  const described = describeBackup(parsed.parsed)
+  assert.equal(described.some((line) => line.startsWith('阅读进度 ') && line.includes('1')), true)
 })
 
 test('blocked storage does not throw and export refuses cleanly', () => {

@@ -160,6 +160,8 @@ export function describeBackup(parsed) {
   lines.push(`刷题作答 ${answers ? Object.keys(answers).length : 0} 题`)
   const points = parsed[GRAMMAR_KEY]?.value?.points
   lines.push(`语法进度 ${points ? Object.keys(points).length : 0} 条`)
+  const reading = parsed[READING_PROGRESS_KEY]?.value?.articles
+  lines.push(`阅读进度 ${reading && typeof reading === 'object' ? Object.keys(reading).length : 0} 篇`)
   lines.push(`备份里共有 ${Object.keys(parsed).length} 项本机记录`)
   return lines
 }

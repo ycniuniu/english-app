@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from 'react'
 import { chunkForSpeech } from './text.js'
-import { chooseVoice, chosenKind, voiceKind } from './voice.js'
+import { chooseVoice, settledJapaneseKind, settledKind, voiceKind } from './voice.js'
 
 const listeners = new Set()
 
@@ -8,6 +8,8 @@ let generation = 0
 let session = null
 let keepAlive = null
 let started = false
+
+let voiceSettled = false
 
 let snapshot = {
   status: 'idle',
@@ -47,7 +49,8 @@ function clearKeepAlive() {
   }
 }
 
-function refreshVoice() {
+function refreshVoice(settle = false) {
+  if (settle) voiceSettled = true
   const synth = window.speechSynthesis
   if (!synth) {
     publish({ voice: 'unsupported', voiceName: '', jaVoice: 'unsupported', jaVoiceName: '' })
@@ -57,9 +60,9 @@ function refreshVoice() {
   const chosen = chooseVoice(voices)
   const japanese = chooseVoice(voices, 'ja')
   publish({
-    voice: chosenKind(voices),
+    voice: settledKind(voices, voiceSettled),
     voiceName: chosen?.name || '',
-    jaVoice: voices.length ? (japanese ? 'ja' : 'none') : 'pending',
+    jaVoice: settledJapaneseKind(voices, voiceSettled),
     jaVoiceName: japanese?.name || '',
   })
 }
@@ -71,11 +74,11 @@ export function initSpeech() {
     publish({ voice: 'unsupported', voiceName: '', jaVoice: 'unsupported', jaVoiceName: '' })
     return
   }
-  refreshVoice()
-  window.speechSynthesis.addEventListener('voiceschanged', refreshVoice)
+  refreshVoice(false)
+  window.speechSynthesis.addEventListener('voiceschanged', () => refreshVoice(false))
   // Some phone browsers fill the voice list a moment later, without another event.
-  window.setTimeout(refreshVoice, 250)
-  window.setTimeout(refreshVoice, 1000)
+  window.setTimeout(() => refreshVoice(false), 250)
+  window.setTimeout(() => refreshVoice(true), 1200)
 }
 
 function stopQuiet() {
