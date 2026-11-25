@@ -71,6 +71,7 @@ function SpokenLine({ text, zh, id, rate, label, englishClass }) {
 const WordFacts = memo(function WordFacts({ detail, reveal, rate, speakId, headword, headZh }) {
   if (!detail) return null
   const forms = describeForms(detail.forms, detail.senses, headword)
+  const [openForm, setOpenForm] = useState(0)
   const labels = wordPosLabels(detail.senses)
   const glosses = reveal ? detail.senses : recallGlosses(detail.senses, headZh)
   const showSensePos = reveal || glossPosVaries(glosses)
@@ -101,19 +102,31 @@ const WordFacts = memo(function WordFacts({ detail, reveal, rate, speakId, headw
                   </span>
                 ) : null}
                 {item.examples?.length ? (
-                  <div className="form-examples">
-                    {item.examples.map(([en, zh], exampleIndex) => (
-                      <SpokenLine
-                        key={`${exampleIndex}-${en}`}
-                        text={en}
-                        zh={zh}
-                        id={`${speakId}-form-${index}-${exampleIndex}`}
-                        rate={rate}
-                        label="朗读这个例句"
-                        englishClass="example-en"
-                      />
-                    ))}
-                  </div>
+                  <>
+                    <button
+                      type="button"
+                      className="form-toggle"
+                      aria-expanded={openForm === index}
+                      onClick={() => setOpenForm(openForm === index ? -1 : index)}
+                    >
+                      {openForm === index ? '收起例句' : '看例句'}
+                    </button>
+                    {openForm === index ? (
+                      <div className="form-examples">
+                        {item.examples.map(([en, zh], exampleIndex) => (
+                          <SpokenLine
+                            key={`${exampleIndex}-${en}`}
+                            text={en}
+                            zh={zh}
+                            id={`${speakId}-form-${index}-${exampleIndex}`}
+                            rate={rate}
+                            label="朗读这个例句"
+                            englishClass="example-en"
+                          />
+                        ))}
+                      </div>
+                    ) : null}
+                  </>
                 ) : null}
               </li>
             ))}

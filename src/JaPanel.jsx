@@ -51,6 +51,7 @@ const JaFacts = memo(function JaFacts({ item, reveal, rate }) {
   const labels = entry.pos || []
   const speakId = `ja-${item.key}`
   const forms = item.kind === 'conj' ? (item.form ? [item.form] : []) : entry.forms || []
+  const [openForm, setOpenForm] = useState(forms[0]?.key || 'plain')
   const posName = formPos(entry)
   const glosses = reveal ? entry.senses || [] : recallGlosses(entry.senses, entry.senses?.[0]?.zh)
   const showSensePos = reveal || glossPosVaries(glosses)
@@ -100,18 +101,28 @@ const JaFacts = memo(function JaFacts({ item, reveal, rate }) {
                     compact
                     lang="ja-JP"
                   />
-                  <div className="form-examples">
-                    {examplesForJaEntry(entry, form).map(([ja, zh], index) => (
-                      <JaLine
-                        key={`${form.key}-${index}-${ja}`}
-                        text={ja}
-                        zh={zh}
-                        id={`${speakId}-formex-${form.key}-${index}`}
-                        rate={rate}
-                        label="朗读这个例句"
-                      />
-                    ))}
-                  </div>
+                  <button
+                    type="button"
+                    className="form-toggle"
+                    aria-expanded={openForm === form.key}
+                    onClick={() => setOpenForm(openForm === form.key ? '' : form.key)}
+                  >
+                    {openForm === form.key ? '收起例句' : '看例句'}
+                  </button>
+                  {openForm === form.key ? (
+                    <div className="form-examples">
+                      {examplesForJaEntry(entry, form).map(([ja, zh], index) => (
+                        <JaLine
+                          key={`${form.key}-${index}-${ja}`}
+                          text={ja}
+                          zh={zh}
+                          id={`${speakId}-formex-${form.key}-${index}`}
+                          rate={rate}
+                          label="朗读这个例句"
+                        />
+                      ))}
+                    </div>
+                  ) : null}
                 </li>
               ))
             ) : (
@@ -125,18 +136,28 @@ const JaFacts = memo(function JaFacts({ item, reveal, rate }) {
                   compact
                   lang="ja-JP"
                 />
-                <div className="form-examples">
-                  {examplesForJaEntry(entry, null).map(([ja, zh], index) => (
-                    <JaLine
-                      key={`plain-${index}-${ja}`}
-                      text={ja}
-                      zh={zh}
-                      id={`${speakId}-formex-plain-${index}`}
-                      rate={rate}
-                      label="朗读这个例句"
-                    />
-                  ))}
-                </div>
+                <button
+                  type="button"
+                  className="form-toggle"
+                  aria-expanded={openForm === 'plain'}
+                  onClick={() => setOpenForm(openForm === 'plain' ? '' : 'plain')}
+                >
+                  {openForm === 'plain' ? '收起例句' : '看例句'}
+                </button>
+                {openForm === 'plain' ? (
+                  <div className="form-examples">
+                    {examplesForJaEntry(entry, null).map(([ja, zh], index) => (
+                      <JaLine
+                        key={`plain-${index}-${ja}`}
+                        text={ja}
+                        zh={zh}
+                        id={`${speakId}-formex-plain-${index}`}
+                        rate={rate}
+                        label="朗读这个例句"
+                      />
+                    ))}
+                  </div>
+                ) : null}
               </li>
             )}
           </ul>

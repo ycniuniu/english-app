@@ -756,6 +756,18 @@ main {
   overflow-wrap: anywhere;
 }
 
+.form-toggle {
+  flex: 1 0 100%;
+  min-height: 36px;
+  margin: 0;
+  padding: 2px 0 4px;
+  border: 0;
+  background: transparent;
+  color: var(--cinnabar);
+  font-size: 14px;
+  text-align: left;
+}
+
 .form-examples {
   flex: 1 0 100%;
   display: flex;
@@ -1316,6 +1328,36 @@ main {
   width: auto;
   min-height: 44px;
   padding: 0 12px;
+}
+
+.article-ja {
+  font-size: 22px;
+  line-height: 2.15;
+}
+
+.article-ja rt {
+  font-size: 0.45em;
+}
+
+.article-zh {
+  margin-top: 18px;
+  color: var(--ink-soft);
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.reading-play {
+  display: flex;
+  gap: 8px;
+  margin: 8px 0 16px;
+}
+
+.reading-play button {
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fffdf8;
 }
 
 .reading-frame {

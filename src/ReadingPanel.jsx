@@ -1,6 +1,109 @@
 import { useEffect, useState } from 'react'
+import { stopSpeech } from './speech.js'
 
 const LEVELS = ['N5', 'N4', 'N3', 'N2', 'N1']
+
+function ArticleView({ id, titleZh, read, onBack, onMarkRead }) {
+  const [doc, setDoc] = useState(null)
+  const [failed, setFailed] = useState(false)
+  const [playing, setPlaying] = useState(false)
+
+  useEffect(() => {
+    let alive = true
+    setDoc(null)
+    setFailed(false)
+    fetch(`/ja-reading/articles/${id}.html`)
+      .then((response) => {
+        if (!response.ok) throw new Error('status')
+        return response.text()
+      })
+      .then((html) => {
+        const parsed = new DOMParser().parseFromString(html, 'text/html')
+        const ja = parsed.querySelector('.body-ja')?.innerHTML || ''
+        const zh = parsed.querySelector('.body-zh')?.innerHTML || ''
+        const title = parsed.querySelector('h1')?.textContent || id
+        const zhTitle = parsed.querySelector('.title-zh')?.textContent || titleZh
+        let speech = ''
+        try {
+          speech = JSON.parse(parsed.getElementById('speech-source')?.textContent || '{}').text || ''
+        } catch {
+          speech = ''
+        }
+        if (!ja) throw new Error('empty')
+        if (alive) setDoc({ ja, zh, title, zhTitle, speech })
+      })
+      .catch(() => {
+        if (alive) setFailed(true)
+      })
+    return () => {
+      alive = false
+      stopSpeech()
+      if (window.speechSynthesis) window.speechSynthesis.cancel()
+    }
+  }, [id, titleZh])
+
+  function playAll() {
+    if (!doc?.speech || !window.speechSynthesis) return
+    window.speechSynthesis.cancel()
+    const parts = doc.speech.split(/(?<=[。！？!?])/).map((item) => item.trim()).filter(Boolean)
+    let index = 0
+    const speakNext = () => {
+      if (index >= parts.length) {
+        setPlaying(false)
+        return
+      }
+      const utter = new SpeechSynthesisUtterance(parts[index])
+      utter.lang = 'ja-JP'
+      utter.onend = () => {
+        index += 1
+        speakNext()
+      }
+      utter.onerror = () => setPlaying(false)
+      window.speechSynthesis.speak(utter)
+    }
+    setPlaying(true)
+    speakNext()
+  }
+
+  function stopAll() {
+    setPlaying(false)
+    if (window.speechSynthesis) window.speechSynthesis.cancel()
+    stopSpeech()
+  }
+
+  return (
+    <section className="panel reading-article">
+      <div className="reading-bar">
+        <button type="button" className="ghost" onClick={onBack}>
+          返回书架
+        </button>
+        <p className="meta">{doc?.zhTitle || titleZh || id}</p>
+        <button type="button" className="ghost" onClick={() => onMarkRead(id, !read)}>
+          {read ? '取消已读' : '标为已读'}
+        </button>
+      </div>
+      <div className="hub-body article-body">
+        {failed ? <p className="meta">这篇没有打开。</p> : null}
+        {!doc && !failed ? <p className="meta">正在打开这篇…</p> : null}
+        {doc ? (
+          <>
+            <h2 lang="ja">{doc.title}</h2>
+            <div className="reading-play">
+              <button type="button" onClick={playAll} disabled={playing}>
+                播放全文
+              </button>
+              <button type="button" onClick={stopAll}>
+                停止
+              </button>
+            </div>
+            <div className="article-ja" lang="ja" dangerouslySetInnerHTML={{ __html: doc.ja }} />
+            <div className="article-zh" lang="zh-CN" dangerouslySetInnerHTML={{ __html: doc.zh }} />
+          </>
+        ) : null}
+      </div>
+    </section>
+  )
+}
 
 export function ReadingPanel({ lang, articleId, progress, onOpen, onBack, onMarkRead }) {
   const [articles, setArticles] = useState(null)
@@ -31,8 +134,8 @@ export function ReadingPanel({ lang, articleId, progress, onOpen, onBack, onMark
       <section className="panel reading">
         <div className="hub-body">
           <p className="kicker">阅读 · 英语</p>
-          <h2>英语分级阅读</h2>
-          <p className="lead">这一栏和日语阅读是同一套结构。现在放进来的 100 篇是日语，N5 到 N1 各 20 篇。这里不另编英语文章。</p>
+          <h2>还没有英语短文</h2>
+          <p className="lead">这里不提供英语分级阅读，也不把日语短文当成英语课。要读日语短文，请切换到日语。</p>
         </div>
       </section>
     )
@@ -42,18 +145,13 @@ export function ReadingPanel({ lang, articleId, progress, onOpen, onBack, onMark
     const known = (articles || []).find((item) => item.file === `${articleId}.html`)
     const row = progress.articles[articleId]
     return (
-      <section className="panel reading-article">
-        <div className="reading-bar">
-          <button type="button" className="ghost" onClick={onBack}>
-            返回书架
-          </button>
-          <p className="meta">{known?.title_zh || articleId}</p>
-          <button type="button" className="ghost" onClick={() => onMarkRead(articleId, !(row?.read === true))}>
-            {row?.read ? '取消已读' : '标为已读'}
-          </button>
-        </div>
-        <iframe className="reading-frame" title={known?.title_zh || articleId} src={`/ja-reading/articles/${articleId}.html`} />
-      </section>
+      <ArticleView
+        id={articleId}
+        titleZh={known?.title_zh || ''}
+        read={row?.read === true}
+        onBack={onBack}
+        onMarkRead={onMarkRead}
+      />
     )
   }
 
@@ -63,7 +161,7 @@ export function ReadingPanel({ lang, articleId, progress, onOpen, onBack, onMark
       <div className="hub-body">
         <p className="kicker">阅读 · 日语</p>
         <h2>分级阅读</h2>
-        <p className="lead">沿用原来的 100 篇和注音。打开后仍是原来的文章页。</p>
+        <p className="lead">选一篇来读。汉字上面有注音，后面有中文。</p>
         <div className="level-row" role="tablist" aria-label="阅读等级">
           {LEVELS.map((item) => (
             <button key={item} type="button" role="tab" aria-selected={level === item} onClick={() => setLevel(item)}>
