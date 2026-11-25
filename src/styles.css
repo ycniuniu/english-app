@@ -136,6 +136,20 @@ button:active:not(:disabled) {
   gap: 12px;
 }
 
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.app-mark {
+  width: 40px;
+  height: 40px;
+  flex: none;
+  object-fit: contain;
+}
+
 .title-tools {
   display: flex;
   align-items: center;

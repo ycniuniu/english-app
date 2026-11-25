@@ -200,7 +200,10 @@ export function App() {
     <div className="app">
       <header className="top">
         <div className="title-row">
-          <h1>开口</h1>
+          <div className="brand">
+            <img className="app-mark" src="/niu-badge.jpg" width="40" height="40" alt="NIU 红金凤凰圆形徽章" />
+            <h1>开口</h1>
+          </div>
           <div className="title-tools">
             <button type="button" className="rate-cycle" onClick={cycleRate} aria-label={`语速${rateItem.label}，点击切换`}>
               {rateItem.label}
