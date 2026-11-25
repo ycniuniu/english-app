@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import { chunkForSpeech, splitForDisplay, splitSentences } from '../src/text.js'
-import { chooseVoice, chosenKind, japanesePhrase } from '../src/voice.js'
+import { chooseVoice, chosenKind, japanesePhrase, settledJapaneseKind, settledKind } from '../src/voice.js'
 
 test('splits ordinary sentences', () => {
   assert.deepEqual(splitSentences('Hello! How are you? I am fine.'), [
@@ -79,4 +79,9 @@ test('japanese voice prefers ja-JP and does not change the English choice', () =
   assert.equal(chooseVoice([{ name: 'Ting-Ting', lang: 'zh-CN' }]), null)
   assert.equal(japanesePhrase('ja'), '日语发音')
   assert.equal(japanesePhrase('none'), '未找到日语语音')
+  assert.equal(settledKind([], false), 'pending')
+  assert.equal(settledKind([], true), 'none')
+  assert.equal(settledKind([{ name: 'Samantha', lang: 'en-US' }], true), 'us')
+  assert.equal(settledJapaneseKind([], true), 'none')
+  assert.equal(settledJapaneseKind([{ name: 'Kyoko', lang: 'ja-JP' }], true), 'ja')
 })

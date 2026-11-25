@@ -126,6 +126,20 @@ test('each Japanese form gets two different examples that contain that form', ()
   assert.notEqual(pleaseLines[0][0], pleaseLines[1][0])
   assert.equal(pleaseLines[1][0].includes('どうぞ'), true)
   assert.equal(pleaseLines[1][0] === 'どうぞ。', false)
+  const according = examplesForJaEntry({
+    word: 'よると',
+    pos: ['动词'],
+    senses: [{ pos: '动词', zh: '由于', examples: [['よると。', '由于。']] }],
+  }, null)
+  assert.equal(according[1][0], '場合によると、延期します。')
+  assert.equal(according[0][0] === according[1][0], false)
+  const worry = examplesForJaEntry({
+    word: 'くよくよ',
+    pos: ['副词'],
+    senses: [{ pos: '副词', zh: '担心地', examples: [['くよくよ。', '担心地。']] }],
+  }, null)
+  assert.equal(worry[1][0].includes('くよくよ'), true)
+  assert.equal(worry[1][0] === 'くよくよ。', false)
 })
 
 test('japanese queues keep the same interval rules', () => {

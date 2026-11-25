@@ -83,6 +83,16 @@ export function chosenKind(voices) {
   return voiceKind(voice)
 }
 
+export function settledKind(voices, settled) {
+  if (!voices || voices.length === 0) return settled ? 'none' : 'pending'
+  return chosenKind(voices)
+}
+
+export function settledJapaneseKind(voices, settled) {
+  if (!voices || voices.length === 0) return settled ? 'none' : 'pending'
+  return chooseVoice(voices, 'ja') ? 'ja' : 'none'
+}
+
 export function voicePhrase(kind) {
   switch (kind) {
     case 'us':
