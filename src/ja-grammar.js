@@ -129,6 +129,91 @@ function godanRow(reading, tags, word) {
   }
 }
 
+function shortJaGloss(entry) {
+  const head = String(entry?.senses?.[0]?.zh || '')
+    .split(/[（(，,；;]/)[0]
+    .trim()
+  return head || '这个'
+}
+
+function uniqueJaExamples(entry) {
+  const out = []
+  const seen = new Set()
+  for (const sense of entry?.senses || []) {
+    for (const pair of sense.examples || []) {
+      const ja = String(pair?.[0] || '').trim()
+      const zh = String(pair?.[1] || '').trim()
+      if (!ja || seen.has(ja)) continue
+      seen.add(ja)
+      out.push([ja, zh])
+    }
+  }
+  return out
+}
+
+function withForm(lines, form) {
+  const chosen = []
+  for (const line of lines) {
+    if (!line || chosen.length >= 2) continue
+    const ja = String(line[0] || '').trim()
+    if (!ja || !ja.includes(form) || chosen.some((item) => item[0] === ja)) continue
+    chosen.push([ja, String(line[1] || '').trim()])
+  }
+  return chosen
+}
+
+export function examplesForJaEntry(entry, form) {
+  const gloss = shortJaGloss(entry)
+  const word = form?.word || entry?.word || ''
+  const name = form?.name || ''
+  const existing = uniqueJaExamples(entry).filter((pair) => word && pair[0].includes(word))
+  if (!form) {
+    const lines = [...uniqueJaExamples(entry)]
+    if (lines.length < 2 && (entry?.pos || []).includes('名词') && word) {
+      lines.push([`これは${word}です。`, `这是${gloss}。`])
+    }
+    const chosen = []
+    for (const line of lines) {
+      if (chosen.length >= 2 || chosen.some((item) => item[0] === line[0])) continue
+      chosen.push(line)
+    }
+    return chosen
+  }
+  const extra =
+    name === 'ます形'
+      ? [
+          [`毎日${word}。`, `每天都${gloss}。`],
+          [`今${word}。`, `现在${gloss}。`],
+        ]
+      : name === 'て形'
+        ? [
+            [`${word}ください。`, `请${gloss}。`],
+            [`${word}もいいです。`, `${gloss}也可以。`],
+          ]
+        : name === 'た形'
+          ? [
+              [`昨日${word}。`, `昨天${gloss}了。`],
+              [`もう${word}。`, `已经${gloss}了。`],
+            ]
+          : name === '可能形'
+            ? [
+                [`一人で${word}。`, `一个人也能${gloss}。`],
+                [`${word}ようになりました。`, `已经能${gloss}了。`],
+              ]
+            : name === '否定形'
+              ? [
+                  [`これは${word}。`, `这个不${gloss}。`],
+                  [`今日は${word}。`, `今天不${gloss}。`],
+                ]
+              : name === '过去形'
+                ? [
+                    [`昨日は${word}。`, `昨天很${gloss}。`],
+                    [`前は${word}。`, `以前很${gloss}。`],
+                  ]
+                : []
+  return withForm([...existing, ...extra], word)
+}
+
 export function conjugate(word, reading, tags) {
   const list = tags || []
   const text = String(word || '')

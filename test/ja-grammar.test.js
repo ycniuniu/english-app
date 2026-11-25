@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { conjugate, isKatakanaWord, posLabels, splitKatakana } from '../src/ja-grammar.js'
+import { conjugate, examplesForJaEntry, isKatakanaWord, posLabels, splitKatakana } from '../src/ja-grammar.js'
 import { answersMatchJa } from '../src/ja-answer.js'
 import { buildQueueFromIds, gradeCard, summarizeIds, todayKey } from '../src/srs.js'
 
@@ -91,6 +91,31 @@ test('japanese answers accept kana and ignore spaces', () => {
   assert.equal(answersMatchJa('コー・ヒー', ['コーヒー']), true)
   assert.equal(answersMatchJa('のむ', ['飲む', 'のむ']), true)
   assert.equal(answersMatchJa('たべます', ['食べます']), false)
+})
+
+test('each Japanese form gets two different examples that contain that form', () => {
+  const entry = {
+    word: '食べる',
+    pos: ['动词'],
+    senses: [{ pos: '动词', zh: '吃', examples: [['毎日食べます。', '每天都吃。'], ['食べてください。', '请吃。']] }],
+    forms: conjugate('食べる', 'たべる', ['v1']),
+  }
+  for (const form of entry.forms) {
+    const examples = examplesForJaEntry(entry, form)
+    assert.equal(examples.length, 2)
+    assert.notEqual(examples[0][0], examples[1][0])
+    for (const [ja] of examples) assert.equal(ja.includes(form.word), true)
+  }
+  const noun = {
+    word: '仕事',
+    pos: ['名词'],
+    senses: [{ pos: '名词', zh: '工作', examples: [['仕事。', '工作。']] }],
+    forms: [],
+  }
+  assert.deepEqual(examplesForJaEntry(noun, null), [
+    ['仕事。', '工作。'],
+    ['これは仕事です。', '这是工作。'],
+  ])
 })
 
 test('japanese queues keep the same interval rules', () => {

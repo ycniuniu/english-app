@@ -16,6 +16,7 @@ import {
   summarizeIds,
   todayKey,
 } from './srs.js'
+import { examplesForJaEntry } from './ja-grammar.js'
 import { glossPosVaries, recallGlosses } from './word-facts.js'
 
 const TRACKS = [
@@ -99,6 +100,18 @@ const JaFacts = memo(function JaFacts({ item, reveal, rate }) {
                     compact
                     lang="ja-JP"
                   />
+                  <div className="form-examples">
+                    {examplesForJaEntry(entry, form).map(([ja, zh], index) => (
+                      <JaLine
+                        key={`${form.key}-${index}-${ja}`}
+                        text={ja}
+                        zh={zh}
+                        id={`${speakId}-formex-${form.key}-${index}`}
+                        rate={rate}
+                        label="朗读这个例句"
+                      />
+                    ))}
+                  </div>
                 </li>
               ))
             ) : (
@@ -112,6 +125,18 @@ const JaFacts = memo(function JaFacts({ item, reveal, rate }) {
                   compact
                   lang="ja-JP"
                 />
+                <div className="form-examples">
+                  {examplesForJaEntry(entry, null).map(([ja, zh], index) => (
+                    <JaLine
+                      key={`plain-${index}-${ja}`}
+                      text={ja}
+                      zh={zh}
+                      id={`${speakId}-formex-plain-${index}`}
+                      rate={rate}
+                      label="朗读这个例句"
+                    />
+                  ))}
+                </div>
               </li>
             )}
           </ul>
@@ -134,19 +159,6 @@ const JaFacts = memo(function JaFacts({ item, reveal, rate }) {
                   lang="zh-CN"
                 />
               </p>
-              {reveal
-                ? (sense.examples || []).map(([ja, zh], index) => (
-                    <div key={`${index}-${ja}`} className="example">
-                      <JaLine
-                        text={ja}
-                        zh={zh}
-                        id={`${speakId}-ex-${senseIndex}-${index}`}
-                        rate={rate}
-                        label="朗读这个例句"
-                      />
-                    </div>
-                  ))
-                : null}
             </div>
           ))}
         </div>
