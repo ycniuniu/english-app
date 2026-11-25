@@ -1,11 +1,14 @@
 import { lazy, Suspense, useEffect, useState } from 'react'
 import { DataBackup } from './DataBackup.jsx'
-import { GrammarIcon, QuizIcon, TranslateIcon, WordsIcon } from './icons.jsx'
 import { IosInstallTip } from './IosInstallTip.jsx'
 import { JaPanel } from './JaPanel.jsx'
 import { japanesePhrase } from './voice.js'
+import { legacyTabFor, loadNavigation, NAV_KEY, serializeNavigation } from './navigation.js'
+import { ReadingPanel } from './ReadingPanel.jsx'
+import { loadReadingProgress, markReadingOpened, markReadingRead, READING_PROGRESS_KEY } from './reading-progress.js'
 import { stopSpeech, useSpeech } from './speech.js'
-import { readString, writeString } from './storage.js'
+import { readJson, readString, writeJson, writeString } from './storage.js'
+import { TodayPanel } from './TodayPanel.jsx'
 import { TranslatePanel } from './TranslatePanel.jsx'
 import { frameForViewport, pinDocumentScroll } from './viewport.js'
 import { voicePhrase } from './voice.js'
@@ -25,13 +28,6 @@ function loadRate() {
   return RATES.some((item) => item.id === saved) ? saved : 'normal'
 }
 
-function loadTab() {
-  const saved = readString('kaikou.tab.v1', 'translate')
-  if (saved === 'words' || saved === 'ja') return 'words'
-  if (saved === 'quiz' || saved === 'grammar') return saved
-  return 'translate'
-}
-
 function loadLang() {
   const saved = readString('kaikou.study-lang.v1', '')
   if (saved === 'ja' || saved === 'en') return saved
@@ -39,16 +35,21 @@ function loadLang() {
 }
 
 export function App() {
-  const [tab, setTab] = useState(loadTab)
+  const opened = loadNavigation(readString)
+  const [tab, setTab] = useState(opened.tab)
+  const [study, setStudy] = useState(opened.study)
+  const [articleId, setArticleId] = useState(opened.article)
+  const [translateOpen, setTranslateOpen] = useState(opened.translate === true)
   const [lang, setLang] = useState(loadLang)
-  const [studyOn, setStudyOn] = useState(() => loadTab() === 'words')
-  const [enOn, setEnOn] = useState(() => loadTab() === 'words' && loadLang() === 'en')
-  const [jaOn, setJaOn] = useState(() => loadTab() === 'words' && loadLang() === 'ja')
-  const [quizOn, setQuizOn] = useState(() => loadTab() === 'quiz')
-  const [grammarOn, setGrammarOn] = useState(() => loadTab() === 'grammar')
+  const [vocabOn, setVocabOn] = useState(() => opened.tab === 'vocab')
+  const [enOn, setEnOn] = useState(() => opened.tab === 'vocab' && loadLang() === 'en')
+  const [jaOn, setJaOn] = useState(() => opened.tab === 'vocab' && loadLang() === 'ja')
+  const [quizOn, setQuizOn] = useState(() => opened.study === 'quiz')
+  const [grammarOn, setGrammarOn] = useState(() => opened.study === 'grammar')
   const [backupOpen, setBackupOpen] = useState(false)
   const [grammarFocus, setGrammarFocus] = useState('')
   const [quizFocus, setQuizFocus] = useState('')
+  const [reading, setReading] = useState(() => loadReadingProgress(readJson(READING_PROGRESS_KEY, null)))
   const [rateId, setRateId] = useState(loadRate)
   const speech = useSpeech()
   const rateItem = RATES.find((item) => item.id === rateId) ?? RATES[1]
@@ -62,31 +63,54 @@ export function App() {
   const voiceLabel =
     speech.status === 'speaking'
       ? '发音中'
-      : tab === 'words' && lang === 'ja'
+      : tab === 'vocab' && lang === 'ja'
         ? japanesePhrase(speech.jaVoice)
         : voicePhrase(speech.voice)
 
   function selectTab(next) {
-    if (next === 'words') {
-      setStudyOn(true)
+    stopSpeech()
+    if (next === 'vocab') {
+      setVocabOn(true)
       if (lang === 'ja') setJaOn(true)
       else setEnOn(true)
     }
-    if (next === 'quiz') setQuizOn(true)
-    if (next === 'grammar') setGrammarOn(true)
+    if (next !== 'today') setTranslateOpen(false)
+    if (next !== 'reading') setArticleId('')
     setTab(next)
+  }
+
+  function openFromToday(next) {
+    if (next === 'translate') {
+      setTranslateOpen(true)
+      setTab('today')
+      return
+    }
+    if (next === 'study') {
+      setStudy('hub')
+      selectTab('study')
+      return
+    }
+    selectTab(next)
   }
 
   function openGrammar(id) {
     setGrammarFocus(id)
     setGrammarOn(true)
-    setTab('grammar')
+    setStudy('grammar')
+    setTab('study')
   }
 
   function openQuiz(id) {
     setQuizFocus(id)
     setQuizOn(true)
-    setTab('quiz')
+    setStudy('quiz')
+    setTab('study')
+  }
+
+  function openArticle(id) {
+    stopSpeech()
+    setArticleId(id)
+    setReading((prev) => markReadingOpened(prev, id, new Date().toISOString()))
   }
 
   function selectLang(next) {
@@ -98,8 +122,14 @@ export function App() {
   }
 
   useEffect(() => {
-    writeString('kaikou.tab.v1', tab)
-  }, [tab])
+    writeString(NAV_KEY, serializeNavigation({ tab, study, article: articleId }))
+    const legacy = legacyTabFor({ tab, study, translate: translateOpen })
+    if (legacy) writeString('kaikou.tab.v1', legacy)
+  }, [tab, study, articleId, translateOpen])
+
+  useEffect(() => {
+    writeJson(READING_PROGRESS_KEY, reading)
+  }, [reading])
 
   useEffect(() => {
     writeString('kaikou.rate.v1', rateId)
@@ -170,7 +200,10 @@ export function App() {
     <div className="app">
       <header className="top">
         <div className="title-row">
-          <h1>开口</h1>
+          <div className="brand">
+            <img className="app-mark" src="/niu-badge.jpg" width="40" height="40" alt="NIU 红金凤凰圆形徽章" />
+            <h1>开口</h1>
+          </div>
           <div className="title-tools">
             <button type="button" className="rate-cycle" onClick={cycleRate} aria-label={`语速${rateItem.label}，点击切换`}>
               {rateItem.label}
@@ -196,11 +229,22 @@ export function App() {
       <IosInstallTip />
 
       <main>
-        <div className={tab === 'translate' ? 'panel-wrap' : 'panel-wrap hidden'}>
-          <TranslatePanel rate={rate} />
+        <div className={tab === 'today' ? 'panel-wrap' : 'panel-wrap hidden'}>
+          {translateOpen ? (
+            <section className="panel translate-wrap">
+              <div className="reading-bar">
+                <button type="button" className="ghost" onClick={() => setTranslateOpen(false)}>
+                  返回今日
+                </button>
+              </div>
+              <TranslatePanel rate={rate} />
+            </section>
+          ) : (
+            <TodayPanel lang={lang} onLang={selectLang} onOpen={openFromToday} />
+          )}
         </div>
-        {studyOn ? (
-          <div className={tab === 'words' ? 'panel-wrap words-shell' : 'panel-wrap words-shell hidden'}>
+        {vocabOn ? (
+          <div className={tab === 'vocab' ? 'panel-wrap words-shell' : 'panel-wrap words-shell hidden'}>
             <div className="lang-switch" role="radiogroup" aria-label="词表语言">
               <button type="button" role="radio" aria-checked={lang === 'en'} onClick={() => selectLang('en')}>
                 英语
@@ -220,39 +264,98 @@ export function App() {
             </div>
           </div>
         ) : null}
-        {quizOn ? (
-          <div className={tab === 'quiz' ? 'panel-wrap' : 'panel-wrap hidden'}>
-            <Suspense fallback={<p className="meta study-fallback">正在打开刷题…</p>}>
-              <QuizPanel focusId={quizFocus} onFocusHandled={() => setQuizFocus('')} onOpenGrammar={openGrammar} />
-            </Suspense>
+        <div className={tab === 'study' ? 'panel-wrap' : 'panel-wrap hidden'}>
+          {study === 'hub' ? (
+            <section className="panel study-hub">
+              <div className="hub-body">
+                <p className="kicker">学习 · {lang === 'ja' ? '日语' : '英语'}</p>
+                <h2>语法和刷题</h2>
+                <p className="lead">这里没有背单词。背单词在底部单独的一栏。</p>
+                <div className="lang-switch" role="radiogroup" aria-label="学习语言">
+                  <button type="button" role="radio" aria-checked={lang === 'en'} onClick={() => selectLang('en')}>
+                    英语
+                  </button>
+                  <span className="lang-slash" aria-hidden="true">
+                    /
+                  </span>
+                  <button type="button" role="radio" aria-checked={lang === 'ja'} onClick={() => selectLang('ja')}>
+                    日语
+                  </button>
+                </div>
+                <button type="button" className="hub-card" onClick={() => openGrammar('')}>
+                  <span className="hub-title">语法</span>
+                  <span className="meta">原来的语法课和练习记录。</span>
+                </button>
+                <button type="button" className="hub-card" onClick={() => openQuiz('')}>
+                  <span className="hub-title">刷题</span>
+                  <span className="meta">原来的题库、错题和个人资料导入。</span>
+                </button>
+              </div>
+            </section>
+          ) : null}
+          {grammarOn ? (
+            <div className={study === 'grammar' ? 'study-stage' : 'study-stage hidden'}>
+              <div className="reading-bar">
+                <button type="button" className="ghost" onClick={() => setStudy('hub')}>
+                  返回学习
+                </button>
+              </div>
+              <Suspense fallback={<p className="meta study-fallback">正在打开语法…</p>}>
+                <GrammarPanel focusId={grammarFocus} onFocusHandled={() => setGrammarFocus('')} onOpenQuiz={openQuiz} />
+              </Suspense>
+            </div>
+          ) : null}
+          {quizOn ? (
+            <div className={study === 'quiz' ? 'study-stage' : 'study-stage hidden'}>
+              <div className="reading-bar">
+                <button type="button" className="ghost" onClick={() => setStudy('hub')}>
+                  返回学习
+                </button>
+              </div>
+              <Suspense fallback={<p className="meta study-fallback">正在打开刷题…</p>}>
+                <QuizPanel focusId={quizFocus} onFocusHandled={() => setQuizFocus('')} onOpenGrammar={openGrammar} />
+              </Suspense>
+            </div>
+          ) : null}
+        </div>
+        <div className={tab === 'reading' ? 'panel-wrap' : 'panel-wrap hidden'}>
+          {articleId ? null : (
+          <div className="lang-switch" role="radiogroup" aria-label="阅读语言">
+            <button type="button" role="radio" aria-checked={lang === 'en'} onClick={() => selectLang('en')}>
+              英语
+            </button>
+            <span className="lang-slash" aria-hidden="true">
+              /
+            </span>
+            <button type="button" role="radio" aria-checked={lang === 'ja'} onClick={() => selectLang('ja')}>
+              日语
+            </button>
           </div>
-        ) : null}
-        {grammarOn ? (
-          <div className={tab === 'grammar' ? 'panel-wrap' : 'panel-wrap hidden'}>
-            <Suspense fallback={<p className="meta study-fallback">正在打开语法…</p>}>
-              <GrammarPanel focusId={grammarFocus} onOpenQuiz={openQuiz} />
-            </Suspense>
-          </div>
-        ) : null}
+          )}
+          <ReadingPanel
+            lang={lang}
+            articleId={articleId}
+            progress={reading}
+            onOpen={openArticle}
+            onBack={() => setArticleId('')}
+            onMarkRead={(id, read) => setReading((prev) => markReadingRead(prev, id, read))}
+          />
+        </div>
       </main>
       {backupOpen ? <DataBackup onClose={() => setBackupOpen(false)} /> : null}
 
-      <nav className="nav">
-        <button type="button" aria-current={tab === 'translate' ? 'page' : undefined} onClick={() => selectTab('translate')}>
-          <TranslateIcon />
-          翻译
+      <nav className={articleId && tab === 'reading' ? 'nav hidden' : 'nav'}>
+        <button type="button" aria-current={tab === 'today' ? 'page' : undefined} onClick={() => selectTab('today')}>
+          今日
         </button>
-        <button type="button" aria-current={tab === 'words' ? 'page' : undefined} onClick={() => selectTab('words')}>
-          <WordsIcon />
-          单词
+        <button type="button" aria-current={tab === 'vocab' ? 'page' : undefined} onClick={() => selectTab('vocab')}>
+          背单词
         </button>
-        <button type="button" aria-current={tab === 'quiz' ? 'page' : undefined} onClick={() => selectTab('quiz')}>
-          <QuizIcon />
-          刷题
+        <button type="button" aria-current={tab === 'study' ? 'page' : undefined} onClick={() => selectTab('study')}>
+          学习
         </button>
-        <button type="button" aria-current={tab === 'grammar' ? 'page' : undefined} onClick={() => selectTab('grammar')}>
-          <GrammarIcon />
-          语法学习
+        <button type="button" aria-current={tab === 'reading' ? 'page' : undefined} onClick={() => selectTab('reading')}>
+          阅读
         </button>
       </nav>
       <p className="sr" aria-live="polite">

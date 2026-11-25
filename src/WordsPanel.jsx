@@ -102,13 +102,16 @@ const WordFacts = memo(function WordFacts({ detail, reveal, rate, speakId, headw
                 ) : null}
                 {item.examples?.length ? (
                   <div className="form-examples">
-                    {item.examples.map(([en, zh]) => (
-                      <p key={en} className="form-example">
-                        <span className="form-example-en" lang="en">
-                          {en}
-                        </span>
-                        {zh ? <span className="form-example-zh">{zh}</span> : null}
-                      </p>
+                    {item.examples.map(([en, zh], exampleIndex) => (
+                      <SpokenLine
+                        key={`${exampleIndex}-${en}`}
+                        text={en}
+                        zh={zh}
+                        id={`${speakId}-form-${index}-${exampleIndex}`}
+                        rate={rate}
+                        label="朗读这个例句"
+                        englishClass="example-en"
+                      />
                     ))}
                   </div>
                 ) : null}
@@ -126,20 +129,6 @@ const WordFacts = memo(function WordFacts({ detail, reveal, rate, speakId, headw
                 {showSensePos ? <span className="sense-pos">{broadPos(sense.pos)}</span> : null}
                 <span className="sense-zh">{sense.zh}</span>
               </p>
-              {reveal
-                ? (sense.examples || []).map(([en, zh], index) => (
-                    <div key={`${index}-${en}`} className="example">
-                      <SpokenLine
-                        text={en}
-                        zh={zh}
-                        id={`${speakId}-ex-${senseIndex}-${index}`}
-                        rate={rate}
-                        label="朗读这个例句"
-                        englishClass="example-en"
-                      />
-                    </div>
-                  ))
-                : null}
             </div>
           ))}
         </div>

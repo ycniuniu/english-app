@@ -57,8 +57,9 @@ test('every card has forms, several senses, examples, and phrases', () => {
   assert.ok(makeForms.some((item) => item.label === 'past participle' && item.word === 'made'))
   assert.ok(makeForms.some((item) => item.label === '-ing' && item.word === 'making'))
   for (const item of makeForms) {
-    assert.ok(item.examples?.length >= 1)
-    assert.equal(item.examples[0][0].toLowerCase().includes(item.word), true)
+    assert.equal(item.examples.length, 2)
+    assert.notEqual(item.examples[0][0], item.examples[1][0])
+    for (const [en] of item.examples) assert.equal(en.toLowerCase().includes(item.word), true)
   }
   const glosses = make.senses.map((sense) => sense.zh)
   for (const gloss of ['制造', '使得', '做决定', '赚取']) {
@@ -128,18 +129,22 @@ test('every existing English verb form has an English label and a matching examp
     for (const item of verbItems) {
       counts[item.label] += 1
       assert.equal(/[\u4e00-\u9fff]/.test(item.label), false)
-      assert.ok(item.examples?.length >= 1 && item.examples.length <= 2)
-      assert.equal(
-        containsForm(item.examples[0][0], item.word),
-        true,
-        `${words[id][0]} ${item.label} ${item.word} :: ${item.examples[0][0]}`,
-      )
-      assert.ok(item.examples[0][1].length > 0)
+      assert.equal(item.examples.length, 2, `${words[id][0]} ${item.label}`)
+      assert.notEqual(item.examples[0][0], item.examples[1][0])
+      for (const [en, zh] of item.examples) {
+        assert.equal(containsForm(en, item.word), true, `${words[id][0]} ${item.label} ${item.word} :: ${en}`)
+        assert.ok(zh.length > 0)
+      }
     }
     for (const item of items) {
       if (verbLabels.has(item.label)) continue
-      assert.equal(item.examples, undefined)
       assert.match(item.label, /[\u4e00-\u9fff]/)
+      if (!item.word) continue
+      assert.equal(item.examples?.length, 2, `${words[id][0]} ${item.label}`)
+      assert.notEqual(item.examples[0][0], item.examples[1][0])
+      for (const [en] of item.examples) {
+        assert.equal(containsForm(en, item.word), true, `${words[id][0]} ${item.label} ${item.word} :: ${en}`)
+      }
     }
   }
   assert.equal(verbHeads, 3866)

@@ -49,7 +49,7 @@ function containsForm(sentence, form) {
   return false
 }
 
-test('verb forms use short English labels and one matching example each', () => {
+test('verb forms use short English labels and two matching examples each', () => {
   const forms = describeForms(['动词 make / made / made / making'], [{ pos: '及物动词', zh: '制造' }])
   assert.deepEqual(
     forms.map((item) => item.label),
@@ -61,9 +61,12 @@ test('verb forms use short English labels and one matching example each', () => 
   )
   for (const item of forms) {
     assert.equal(/[\u4e00-\u9fff]/.test(item.label), false)
-    assert.ok(item.examples.length >= 1 && item.examples.length <= 2)
-    assert.equal(containsForm(item.examples[0][0], item.word), true)
-    assert.equal(typeof item.examples[0][1], 'string')
+    assert.equal(item.examples.length, 2)
+    assert.notEqual(item.examples[0][0], item.examples[1][0])
+    for (const [en, zh] of item.examples) {
+      assert.equal(containsForm(en, item.word), true)
+      assert.equal(typeof zh, 'string')
+    }
   }
   const past = forms.find((item) => item.label === 'past')
   const participle = forms.find((item) => item.label === 'past participle')
@@ -75,7 +78,9 @@ test('verb forms use short English labels and one matching example each', () => 
     'base,past,-ing',
   )
   const know = describeForms(['动词 know / knew / known / knowing'], [{ pos: '动词', zh: '知道' }])
-  assert.equal(know.find((item) => item.label === '-ing').examples[0][0].includes('are knowing'), false)
+  for (const [en] of know.find((item) => item.label === '-ing').examples) {
+    assert.equal(en.includes('are knowing'), false)
+  }
   const seem = describeForms(['动词 seem / seemed / seemed / seeming'], [{ pos: '不及物动词', zh: '似乎' }])
   assert.match(seem[0].examples[0][0], /\bseem\b/)
   assert.equal(seem[0].examples[0][0].includes('every day'), false)
@@ -83,15 +88,21 @@ test('verb forms use short English labels and one matching example each', () => 
 
 test('noun and adjective forms stay in Chinese', () => {
   assert.deepEqual(wordPosLabels([{ pos: '及物动词' }, { pos: '名词' }]), ['动词', '名词'])
-  assert.deepEqual(describeForms(['名词 child / children'], [{ pos: '名词' }]), [
-    { label: '原形（名词）', word: 'child' },
-    { label: '复数（名词）', word: 'children' },
-  ])
-  assert.deepEqual(describeForms(['形容词 good / better / best'], [{ pos: '形容词' }]), [
-    { label: '原形（形容词）', word: 'good' },
-    { label: '比较级（形容词）', word: 'better' },
-    { label: '最高级（形容词）', word: 'best' },
-  ])
+  assert.deepEqual(
+    describeForms(['名词 child / children'], [{ pos: '名词', zh: '孩子' }]).map((item) => [item.label, item.word, item.examples.length]),
+    [
+      ['原形（名词）', 'child', 2],
+      ['复数（名词）', 'children', 2],
+    ],
+  )
+  assert.deepEqual(
+    describeForms(['形容词 good / better / best'], [{ pos: '形容词', zh: '好的' }]).map((item) => [item.label, item.word, item.examples.length]),
+    [
+      ['原形（形容词）', 'good', 2],
+      ['比较级（形容词）', 'better', 2],
+      ['最高级（形容词）', 'best', 2],
+    ],
+  )
   assert.deepEqual(
     describeForms(['形容词 difficult / more difficult / most difficult'], [{ pos: '形容词' }]).map((item) => item.word),
     ['difficult', 'more difficult', 'most difficult'],
@@ -102,12 +113,14 @@ test('noun and adjective forms stay in Chinese', () => {
   assert.deepEqual(describeForms(['情态动词，无词形变化'], [{ pos: '情态动词' }]), [
     { label: '无词形变化（动词）', word: '' },
   ])
-  assert.deepEqual(describeForms(['复数 ones'], [{ pos: '数词' }, { pos: '名词' }]), [
-    { label: '复数（名词）', word: 'ones' },
-  ])
-  assert.deepEqual(describeForms(['本身常作最高级'], [{ pos: '副词' }], 'most'), [
-    { label: '最高级（形容词）', word: 'most' },
-  ])
+  assert.deepEqual(
+    describeForms(['复数 ones'], [{ pos: '数词' }, { pos: '名词', zh: '一个' }]).map((item) => [item.label, item.word, item.examples.length]),
+    [['复数（名词）', 'ones', 2]],
+  )
+  assert.deepEqual(
+    describeForms(['本身常作最高级'], [{ pos: '副词' }], 'most').map((item) => [item.label, item.word, item.examples.length]),
+    [['最高级（形容词）', 'most', 2]],
+  )
 })
 
 test('content words in an example can be spoken on their own', () => {
