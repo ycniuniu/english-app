@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import { legacyTabFor, loadNavigation, navigationFromLegacy, serializeNavigation } from '../src/navigation.js'
+import { readFileSync } from 'node:fs'
 import { loadReadingProgress, markReadingOpened, markReadingRead, READING_PROGRESS_KEY } from '../src/reading-progress.js'
 import { READ_KEY, WORD_KEY } from '../src/storage-keys.js'
 
@@ -30,4 +31,7 @@ test('reading progress is separate from the old read draft and word cards', () =
   const loaded = loadReadingProgress(read)
   assert.equal(loaded.articles['n4-05'].read, true)
   assert.deepEqual(loadReadingProgress({ articles: { bad: { read: true } } }).articles, {})
+  const css = readFileSync('public/ja-reading/css/style.css', 'utf8')
+  assert.equal(css.includes('font-display: block'), false)
+  assert.match(css, /font-display:\s*swap/)
 })

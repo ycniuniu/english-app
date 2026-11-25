@@ -270,7 +270,7 @@ export function App() {
               <div className="hub-body">
                 <p className="kicker">学习 · {lang === 'ja' ? '日语' : '英语'}</p>
                 <h2>语法和刷题</h2>
-                <p className="lead">这里没有背单词。背单词在底部单独的一栏。</p>
+                <p className="lead">做语法课，或做一套练习题。</p>
                 <div className="lang-switch" role="radiogroup" aria-label="学习语言">
                   <button type="button" role="radio" aria-checked={lang === 'en'} onClick={() => selectLang('en')}>
                     英语

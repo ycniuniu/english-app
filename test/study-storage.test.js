@@ -3,7 +3,7 @@ import test from 'node:test'
 import { applyBackup, buildBackup, parseBackupText, undoLastImport } from '../src/backup.js'
 import { dueGrammarIds, loadGrammar, readGrammarStore, recordExercise, setLearned, toggleGrammarFavorite } from '../src/grammar-progress.js'
 import { answerQuestion, loadQuiz, questionsFor, readQuizStore, shuffleIds, summarizeQuestions, toggleFavorite, wrongIds } from '../src/quiz-progress.js'
-import { GRAMMAR_KEY, JA_WORD_KEY, QUIZ_KEY, SNAPSHOT_KEY, WORD_KEY } from '../src/storage-keys.js'
+import { GRAMMAR_KEY, JA_WORD_KEY, QUIZ_KEY, READING_PROGRESS_KEY, SNAPSHOT_KEY, WORD_KEY } from '../src/storage-keys.js'
 import { questions } from '../src/data/study-index.js'
 
 const wordCard = { interval: 7, ease: 2.3, reps: 4, lapses: 1, due: '2026-12-01', note: 'keep-me' }
@@ -203,6 +203,31 @@ test('a full disk rolls the import back', () => {
   assert.match(result.error, /退回|没有写入|存储满/)
   assert.equal(store.data[WORD_KEY], WORDS)
   assert.equal(store.data[QUIZ_KEY], undefined)
+})
+
+test('reading progress roundtrip keeps old word cards', () => {
+  const reading = JSON.stringify({ articles: { 'n5-01': { openedAt: '2026-11-25T01:00:00.000Z', read: true } } })
+  const store = memory({ [WORD_KEY]: WORDS, [JA_WORD_KEY]: JA, [READING_PROGRESS_KEY]: reading })
+  const built = buildBackup(store.getItem, '2026-11-25T02:00:00.000Z')
+  assert.equal(built.ok, true)
+  assert.equal(built.backup.keys[WORD_KEY], WORDS)
+  assert.equal(built.backup.keys[READING_PROGRESS_KEY], reading)
+  const parsed = parseBackupText(JSON.stringify(built.backup))
+  assert.equal(parsed.ok, true)
+  const empty = memory({})
+  const imported = applyBackup({ mode: 'merge', parsed: parsed.parsed, ...empty })
+  assert.equal(imported.ok, true)
+  assert.equal(empty.data[WORD_KEY], WORDS)
+  assert.equal(empty.data[JA_WORD_KEY], JA)
+  assert.equal(JSON.parse(empty.data[READING_PROGRESS_KEY]).articles['n5-01'].read, true)
+  const older = JSON.stringify({ articles: { 'n4-05': { openedAt: '2026-11-01T00:00:00.000Z', read: false } } })
+  const keep = memory({ [WORD_KEY]: WORDS, [READING_PROGRESS_KEY]: older })
+  const merged = applyBackup({ mode: 'merge', parsed: parsed.parsed, ...keep })
+  assert.equal(merged.ok, true)
+  assert.equal(keep.data[WORD_KEY], WORDS)
+  const articles = JSON.parse(keep.data[READING_PROGRESS_KEY]).articles
+  assert.equal(articles['n5-01'].read, true)
+  assert.equal(articles['n4-05'].read, false)
 })
 
 test('blocked storage does not throw and export refuses cleanly', () => {

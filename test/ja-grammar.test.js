@@ -116,6 +116,16 @@ test('each Japanese form gets two different examples that contain that form', ()
     ['仕事。', '工作。'],
     ['これは仕事です。', '这是工作。'],
   ])
+  const please = {
+    word: 'どうぞ',
+    pos: ['副词'],
+    senses: [{ pos: '副词', zh: '请', examples: [['どうぞ。', '请。']] }],
+  }
+  const pleaseLines = examplesForJaEntry(please, null)
+  assert.equal(pleaseLines.length, 2)
+  assert.notEqual(pleaseLines[0][0], pleaseLines[1][0])
+  assert.equal(pleaseLines[1][0].includes('どうぞ'), true)
+  assert.equal(pleaseLines[1][0] === 'どうぞ。', false)
 })
 
 test('japanese queues keep the same interval rules', () => {

@@ -5,6 +5,7 @@ import {
   JA_WORD_KEY,
   RATE_KEY,
   READ_KEY,
+  READING_PROGRESS_KEY,
   SNAPSHOT_KEY,
   STUDY_LANG_KEY,
   TAB_KEY,
@@ -13,6 +14,7 @@ import {
 } from './storage-keys.js'
 import { loadGrammar } from './grammar-progress.js'
 import { loadQuiz } from './quiz-progress.js'
+import { loadReadingProgress } from './reading-progress.js'
 
 export const BACKUP_FORMAT = 'kaikou-backup'
 export const BACKUP_VERSION = 1
@@ -101,6 +103,10 @@ function validateParsed(key, value, raw) {
   if (key === TRANSLATE_KEY) return validateTranslate(value)
   if (key === 'kaikou.quiz.v1') return validateQuizValue(value)
   if (key === GRAMMAR_KEY) return validateGrammarValue(value)
+  if (key === READING_PROGRESS_KEY) {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return '阅读进度损坏，整份没有写入。'
+    return ''
+  }
   return `不认识的记录 ${key}，整份没有写入。`
 }
 
@@ -284,6 +290,31 @@ function mergeGrammar(localRaw, backupValue) {
   return { raw: JSON.stringify({ ...local, version: 1, points }), changed: true }
 }
 
+function mergeReading(localRaw, incoming) {
+  let local = { articles: {} }
+  if (typeof localRaw === 'string' && localRaw) {
+    try {
+      local = loadReadingProgress(JSON.parse(localRaw))
+    } catch {
+      return { error: '本机阅读进度读不出来。合并已停止，没有覆盖。' }
+    }
+  }
+  const remote = loadReadingProgress(incoming)
+  const articles = { ...remote.articles }
+  for (const [id, row] of Object.entries(local.articles)) {
+    const other = articles[id]
+    if (!other) {
+      articles[id] = row
+      continue
+    }
+    articles[id] = {
+      openedAt: row.openedAt || other.openedAt,
+      read: row.read === true || other.read === true,
+    }
+  }
+  return { raw: JSON.stringify({ articles }), changed: JSON.stringify({ articles }) !== localRaw }
+}
+
 function mergeOne(key, localRaw, packed) {
   if (STRING_KEYS.has(key)) {
     if (typeof localRaw === 'string') return { raw: localRaw, changed: false }
@@ -292,6 +323,7 @@ function mergeOne(key, localRaw, packed) {
   if (key === WORD_KEY || key === JA_WORD_KEY) return mergeCardStore(localRaw, packed.value)
   if (key === 'kaikou.quiz.v1') return mergeQuiz(localRaw, packed.value)
   if (key === GRAMMAR_KEY) return mergeGrammar(localRaw, packed.value)
+  if (key === READING_PROGRESS_KEY) return mergeReading(localRaw, packed.value)
   if (typeof localRaw === 'string') return { raw: localRaw, changed: false }
   return { raw: packed.raw, changed: true }
 }

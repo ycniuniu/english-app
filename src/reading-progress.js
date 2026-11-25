@@ -1,4 +1,4 @@
-export const READING_PROGRESS_KEY = 'kaikou.ja-reading.progress.v1'
+export { READING_PROGRESS_KEY } from './storage-keys.js'
 const ID_RE = /^n[1-5]-\d{2}$/
 
 export function loadReadingProgress(raw) {
